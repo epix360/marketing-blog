@@ -1,0 +1,123 @@
+---
+// Search.astro - Global search component using Pagefind
+---
+
+<div id="search-container">
+	<label for="search-input">Search:</label>
+	<input 
+		type="search" 
+		id="search-input" 
+		placeholder="Search blog posts..."
+		autocomplete="off"
+	/>
+	<div id="search-results" style="display: none;">
+		<!-- Search results will be populated here -->
+	</div>
+</div>
+
+<script>
+	// Load Pagefind after the page loads
+	async function loadPagefind() {
+		try {
+			const pagefind = await import('/pagefind/pagefind.js');
+			
+			const searchInput = document.getElementById('search-input');
+			const searchResults = document.getElementById('search-results');
+			
+			let searchTimeout;
+			
+			searchInput?.addEventListener('input', async (e) => {
+				const query = e.target.value.trim();
+				
+				if (searchTimeout) {
+					clearTimeout(searchTimeout);
+				}
+				
+				if (query.length < 2) {
+					searchResults.style.display = 'none';
+					return;
+				}
+				
+				// Debounce search
+				searchTimeout = setTimeout(async () => {
+					try {
+						const results = await pagefind.search(query);
+						
+						if (results.results.length > 0) {
+							const resultHtml = results.results.map(result => `
+								<div style="margin-bottom: 1rem; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px;">
+									<h4 style="margin: 0 0 0.25rem 0;">
+										<a href="${result.url}" style="text-decoration: none; color: inherit;">
+											${result.data?.meta?.title || result.url}
+										</a>
+									</h4>
+									<p style="margin: 0; font-size: 0.875rem; color: #666;">
+										${result.data?.meta?.description || result.url}
+									</p>
+								</div>
+							`).join('');
+							
+							searchResults.innerHTML = resultHtml;
+							searchResults.style.display = 'block';
+						} else {
+							searchResults.innerHTML = '<p style="padding: 0.5rem;">No results found.</p>';
+							searchResults.style.display = 'block';
+						}
+					} catch (error) {
+						console.error('Search error:', error);
+					}
+				}, 300);
+			});
+			
+			// Hide results when clicking outside
+			document.addEventListener('click', (e) => {
+				if (!searchInput?.contains(e.target) && !searchResults?.contains(e.target)) {
+					searchResults.style.display = 'none';
+				}
+			});
+			
+		} catch (error) {
+			console.error('Failed to load Pagefind:', error);
+		}
+	}
+	
+	// Load Pagefind when DOM is ready
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', loadPagefind);
+	} else {
+		loadPagefind();
+	}
+</script>
+
+<style>
+	#search-container {
+		position: relative;
+		margin: 1rem 0;
+	}
+	
+	#search-input {
+		width: 100%;
+		padding: 0.5rem;
+		border: 1px solid #ccc;
+		border-radius: 4px;
+		font-size: 1rem;
+	}
+	
+	#search-results {
+		position: absolute;
+		top: 100%;
+		left: 0;
+		right: 0;
+		background: white;
+		border: 1px solid #ccc;
+		border-top: none;
+		max-height: 300px;
+		overflow-y: auto;
+		z-index: 1000;
+		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+	}
+	
+	#search-results a:hover {
+		text-decoration: underline;
+	}
+</style>

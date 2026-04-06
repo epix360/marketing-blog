@@ -1,0 +1,74 @@
+{
+  "cms": {
+    "name": "Marketing Blog CMS",
+    "logo": "/images/logo.png",
+    "theme": {
+      "primary": "#007bff",
+      "secondary": "#6c757d"
+    }
+  },
+  "collections": {
+    "blog": {
+      "name": "Blog Posts",
+      "description": "Manage blog posts with frontmatter",
+      "path": "src/content/blog",
+      "fields": [
+        {
+          "name": "title",
+          "label": "Title",
+          "type": "text",
+          "required": true,
+          "validation": {
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        {
+          "name": "pubDate",
+          "label": "Publication Date",
+          "type": "date",
+          "required": true,
+          "format": "YYYY-MM-DD"
+        },
+        {
+          "name": "description",
+          "label": "Description",
+          "type": "textarea",
+          "required": true,
+          "validation": {
+            "minLength": 10,
+            "maxLength": 500
+          }
+        },
+        {
+          "name": "heroImage",
+          "label": "Hero Image",
+          "type": "image",
+          "required": false,
+          "path": "public/images",
+          "help": "Upload hero images to public/images/ directory"
+        },
+        {
+          "name": "tags",
+          "label": "Tags",
+          "type": "tags",
+          "required": false,
+          "help": "Add tags for categorization"
+        }
+      ],
+      "view": {
+        "default": "table",
+        "fields": ["title", "pubDate", "tags"]
+      }
+    }
+  },
+  "media": {
+    "path": "public/images",
+    "allowedTypes": ["jpg", "jpeg", "png", "gif", "webp"],
+    "maxSize": "5MB"
+  },
+  "git": {
+    "autoCommit": true,
+    "commitMessage": "CMS: Update content"
+  }
+}

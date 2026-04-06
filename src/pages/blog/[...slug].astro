@@ -1,0 +1,65 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+
+export async function getStaticPaths() {
+	const posts = await getCollection('blog');
+	return posts.map((post: CollectionEntry<'blog'>) => ({
+		params: { slug: post.slug },
+		props: { post },
+	}));
+}
+
+// Format date as "April 6, 2026"
+function formatDate(date: Date): string {
+	return date.toLocaleDateString('en-US', {
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric'
+	});
+}
+
+interface Props {
+	post: CollectionEntry<'blog'>;
+}
+
+const { post }: Props = Astro.props;
+const { Content } = await post.render();
+---
+
+<BaseLayout 
+	title={post.data.title}
+	description={post.data.description}
+	image={post.data.heroImage}
+	type="article"
+	tags={post.data.tags}
+	publishedDate={post.data.pubDate}
+>
+	<article>
+		<header>
+			<h1>{post.data.title}</h1>
+			<p><em>{post.data.description}</em></p>
+			<time datetime={post.data.pubDate.toISOString()}>
+				Published on {formatDate(post.data.pubDate)}
+			</time>
+			{post.data.tags && post.data.tags.length > 0 && (
+				<p>
+					<strong>Tags:</strong> {post.data.tags.join(', ')}
+				</p>
+			)}
+		</header>
+		
+		<hr />
+		
+		<section>
+			<Content />
+		</section>
+		
+		<footer>
+			<p>
+				<a href="/marketing-blog/blog/">← Back to Blog</a>
+			</p>
+		</footer>
+	</article>
+</BaseLayout>

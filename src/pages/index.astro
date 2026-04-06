@@ -1,11 +1,12 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
-<Layout>
-	<Welcome />
-</Layout>
+<BaseLayout 
+	title="Marketing Blog - Home"
+	description="Welcome to my marketing blog! Explore articles on digital marketing, content creation, and SEO strategies."
+>
+	<h1>Welcome to My Marketing Blog</h1>
+	<p>This is a static portfolio/blog built with Astro and Pico CSS.</p>
+	<p>Explore the navigation above to learn more about this project.</p>
+</BaseLayout>

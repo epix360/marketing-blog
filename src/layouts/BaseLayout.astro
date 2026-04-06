@@ -1,0 +1,71 @@
+---
+import Search from '../components/Search.astro';
+import Analytics from '../components/Analytics.astro';
+import SEO from '../components/SEO.astro';
+
+export interface Props {
+	title: string;
+	description?: string;
+	image?: string;
+	type?: string;
+	tags?: string[];
+	publishedDate?: Date;
+}
+
+const { 
+	title, 
+	description, 
+	image, 
+	type = 'website', 
+	tags, 
+	publishedDate 
+} = Astro.props;
+const currentYear = new Date().getFullYear();
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<SEO 
+			title={title}
+			description={description}
+			image={image}
+			type={type}
+			tags={tags}
+			publishedDate={publishedDate}
+		/>
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+		<meta name="generator" content={Astro.generator} />
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" />
+	</head>
+	<body>
+		<header>
+			<nav>
+				<ul>
+					<li><strong>Marketing Blog</strong></li>
+				</ul>
+				<ul>
+					<li><a href="/marketing-blog/">Home</a></li>
+					<li><a href="/marketing-blog/blog">Blog</a></li>
+					<li><a href="/marketing-blog/about">About</a></li>
+					<li><a href="/marketing-blog/contact">Contact</a></li>
+				</ul>
+			</nav>
+			<Search />
+		</header>
+		
+		<main class="container">
+			<slot />
+		</main>
+		
+		<footer>
+			<nav>
+				<ul>
+					<li>© {currentYear} Marketing Blog. All rights reserved.</li>
+				</ul>
+			</nav>
+		</footer>
+		<Analytics />
+	</body>
+</html>

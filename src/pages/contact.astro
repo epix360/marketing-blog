@@ -1,0 +1,152 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout 
+	title="Contact - Marketing Blog"
+	description="Get in touch with me! Send a message through the contact form for questions or collaboration opportunities."
+>
+	<h1>Contact Me</h1>
+	<p>Feel free to reach out with any questions or collaboration opportunities.</p>
+	
+	<form id="contact-form">
+		<fieldset>
+			<legend>Send me a message</legend>
+			
+			<label for="name">Name</label>
+			<input 
+				type="text" 
+				id="name" 
+				name="name" 
+				required 
+				placeholder="Your name"
+			/>
+			
+			<label for="email">Email</label>
+			<input 
+				type="email" 
+				id="email" 
+				name="email" 
+				required 
+				placeholder="your.email@example.com"
+			/>
+			
+			<label for="subject">Subject</label>
+			<input 
+				type="text" 
+				id="subject" 
+				name="subject" 
+				required 
+				placeholder="Message subject"
+			/>
+			
+			<label for="message">Message</label>
+			<textarea 
+				id="message" 
+				name="message" 
+				required 
+				rows="6"
+				placeholder="Your message here..."
+			></textarea>
+			
+			<button type="submit" id="submit-btn">Send Message</button>
+		</fieldset>
+	</form>
+	
+	<div id="form-message" role="alert" aria-live="polite"></div>
+</BaseLayout>
+
+<script>
+	import emailjs from '@emailjs/browser';
+	
+	// Initialize EmailJS
+	const serviceID = import.meta.env.PUBLIC_EMAILJS_SERVICE_ID;
+	const templateID = import.meta.env.PUBLIC_EMAILJS_TEMPLATE_ID;
+	const publicKey = import.meta.env.PUBLIC_EMAILJS_PUBLIC_KEY;
+	
+	if (serviceID && templateID && publicKey) {
+		emailjs.init(publicKey);
+	}
+	
+	const form = document.getElementById('contact-form');
+	const submitBtn = document.getElementById('submit-btn');
+	const messageDiv = document.getElementById('form-message');
+	
+	form?.addEventListener('submit', async (e) => {
+		e.preventDefault();
+		
+		if (!serviceID || !templateID || !publicKey) {
+			showMessage('Email service not configured. Please check back later.', 'error');
+			return;
+		}
+		
+		// Show loading state
+		submitBtn.disabled = true;
+		submitBtn.textContent = 'Sending...';
+		
+		try {
+			const formData = new FormData(form);
+			const templateParams = {
+				from_name: formData.get('name'),
+				from_email: formData.get('email'),
+				subject: formData.get('subject'),
+				message: formData.get('message')
+			};
+			
+			await emailjs.send(serviceID, templateID, templateParams);
+			
+			showMessage('Thank you for your message!', 'success');
+			form.reset();
+		} catch (error) {
+			console.error('EmailJS error:', error);
+			showMessage('Something went wrong, please try again later.', 'error');
+		} finally {
+			submitBtn.disabled = false;
+			submitBtn.textContent = 'Send Message';
+		}
+	});
+	
+	function showMessage(text, type) {
+		if (messageDiv) {
+			messageDiv.textContent = text;
+			messageDiv.className = type;
+			messageDiv.style.display = 'block';
+			
+			// Auto-hide after 5 seconds
+			setTimeout(() => {
+				messageDiv.style.display = 'none';
+			}, 5000);
+		}
+	}
+</script>
+
+<style>
+	#form-message {
+		margin-top: 1rem;
+		padding: 0.75rem;
+		border-radius: 4px;
+		display: none;
+	}
+	
+	#form-message.success {
+		background-color: #d4edda;
+		color: #155724;
+		border: 1px solid #c3e6cb;
+	}
+	
+	#form-message.error {
+		background-color: #f8d7da;
+		color: #721c24;
+		border: 1px solid #f5c6cb;
+	}
+	
+	#submit-btn:disabled {
+		opacity: 0.7;
+		cursor: not-allowed;
+	}
+	
+	textarea {
+		resize: vertical;
+		min-height: 120px;
+	}
+</style>

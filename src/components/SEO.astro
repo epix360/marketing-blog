@@ -1,0 +1,83 @@
+---
+// SEO.astro - Dynamic SEO and Open Graph tags component
+
+export interface Props {
+	title?: string;
+	description?: string;
+	image?: string;
+	url?: string;
+	type?: string;
+	siteName?: string;
+	author?: string;
+	publishedDate?: Date;
+	modifiedDate?: Date;
+	tags?: string[];
+}
+
+const {
+	title = 'Marketing Blog',
+	description = 'A static portfolio/blog built with Astro and Pico CSS',
+	image = '/images/og-default.jpg',
+	url = new URL(Astro.url.pathname, Astro.site).href,
+	type = 'website',
+	siteName = 'Marketing Blog',
+	author = 'Marketing Blog',
+	publishedDate,
+	modifiedDate,
+	tags
+} = Astro.props;
+
+// Generate structured data for Schema.org
+function generateStructuredData() {
+	const baseData = {
+		'@context': 'https://schema.org',
+		'@type': type === 'article' ? 'BlogPosting' : 'WebSite',
+		name: title,
+		description: description,
+		url: url,
+		image: image,
+		author: {
+			'@type': 'Person',
+			name: author
+		},
+		publisher: {
+			'@type': 'Organization',
+			name: siteName
+		}
+	};
+
+	// Add article-specific fields
+	if (type === 'article' && publishedDate) {
+		baseData.datePublished = publishedDate.toISOString();
+		baseData.dateModified = modifiedDate?.toISOString() || publishedDate.toISOString();
+		
+		if (tags && tags.length > 0) {
+			baseData.keywords = tags.join(', ');
+		}
+	}
+
+	return JSON.stringify(baseData);
+}
+---
+
+<!-- Basic Meta Tags -->
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content={description} />
+<meta name="author" content={author} />
+
+<!-- Open Graph Tags -->
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:image" content={new URL(image, Astro.site).href} />
+<meta property="og:url" content={url} />
+<meta property="og:type" content={type} />
+<meta property="og:site_name" content={siteName} />
+
+<!-- Additional Meta Tags -->
+<meta name="robots" content="index, follow" />
+<meta name="theme-color" content="#ffffff" />
+<link rel="canonical" href={url} />
+
+<!-- Schema.org Structured Data -->
+<script type="application/ld+json" set:html={generateStructuredData()}></script>

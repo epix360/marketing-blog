@@ -1,0 +1,7 @@
+---
+// Analytics.astro - Umami Cloud analytics component
+---
+
+{import.meta.env.PROD && (
+	<script async defer src="https://analytics.umami.is/script.js" data-website-id={import.meta.env.PUBLIC_UMAMI_WEBSITE_ID}></script>
+)}

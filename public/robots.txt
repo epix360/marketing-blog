@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://epix360.github.io/marketing-blog/sitemap-index.xml
+
+# Block common bot paths
+Disallow: /admin/
+Disallow: /.git/
+Disallow: /node_modules/
