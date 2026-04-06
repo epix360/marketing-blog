@@ -1,11 +1,10 @@
 ---
-title: "Hello World"
+title: Hello World
 pubDate: 2026-04-06
-description: "Welcome to my new marketing blog! This is the first post to test the content collection schema."
-heroImage: "/images/hello-world-hero.jpg"
-tags: ["welcome", "announcement", "marketing"]
+description: Welcome to my new marketing blog! This is the first post to test
+  the content collection schema.
+heroImage: /images/Bat-Georgia.jpg
 ---
-
 # Hello World!
 
 Welcome to my new marketing blog! This is the first post to test the content collection schema and make sure everything is working correctly.
@@ -13,6 +12,7 @@ Welcome to my new marketing blog! This is the first post to test the content col
 ## What to Expect
 
 This blog will cover topics related to:
+
 - Digital marketing strategies
 - Content creation tips
 - SEO best practices
