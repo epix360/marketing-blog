@@ -71,26 +71,6 @@
       ]
     },
     {
-      "name": "blogIndex",
-      "label": "Blog Index",
-      "type": "file",
-      "path": "src/content/home",
-      "format": "yaml-frontmatter",
-      "fields": [
-        {
-          "name": "title",
-          "label": "Title",
-          "type": "string",
-          "required": true
-        },
-        {
-          "name": "body",
-          "label": "Content",
-          "type": "rich-text"
-        }
-      ]
-    },
-    {
       "name": "blog",
       "label": "Blog Posts",
       "type": "collection",
