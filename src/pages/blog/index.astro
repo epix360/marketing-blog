@@ -30,7 +30,7 @@ const sortedPosts = blogPosts.sort((a: CollectionEntry<'blog'>, b: CollectionEnt
 			{sortedPosts.map((post: CollectionEntry<'blog'>) => (
 				<article>
 					<h2>
-						<a href={`/marketing-blog/blog/${post.slug}`}>
+						<a href={`/marketing-blog/blog/${post.id}`}>
 							{post.data.title}
 						</a>
 					</h2>

@@ -1,4 +1,6 @@
 ---
+import '@picocss/pico';
+import '../styles/custom.css';
 import Search from '../components/Search.astro';
 import Analytics from '../components/Analytics.astro';
 import SEO from '../components/SEO.astro';
@@ -37,7 +39,6 @@ const currentYear = new Date().getFullYear();
 		<link rel="icon" type="image/svg+xml" href="/marketing-blog/favicon.svg" />
 		<link rel="icon" href="/marketing-blog/favicon.ico" />
 		<meta name="generator" content={Astro.generator} />
-		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" />
 	</head>
 	<body>
 		<header>

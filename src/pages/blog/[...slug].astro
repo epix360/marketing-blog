@@ -6,7 +6,7 @@ import type { CollectionEntry } from 'astro:content';
 export async function getStaticPaths() {
 	const posts = await getCollection('blog');
 	return posts.map((post: CollectionEntry<'blog'>) => ({
-		params: { slug: post.slug },
+		params: { slug: post.id },
 		props: { post },
 	}));
 }
@@ -25,7 +25,7 @@ interface Props {
 }
 
 const { post }: Props = Astro.props;
-const { Content } = await post.render();
+const rendered = post.rendered;
 ---
 
 <BaseLayout 
@@ -53,7 +53,7 @@ const { Content } = await post.render();
 		<hr />
 		
 		<section>
-			<Content />
+			{rendered && <div set:html={rendered.html} />}
 		</section>
 		
 		<footer>
