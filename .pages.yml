@@ -1,0 +1,45 @@
+{
+  "content": [
+    {
+      "name": "blog",
+      "label": "Blog Posts",
+      "type": "collection",
+      "path": "src/content/blog",
+      "format": "yaml-frontmatter",
+      "fields": [
+        {
+          "name": "title",
+          "label": "Title",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "pubDate",
+          "label": "Date",
+          "type": "date",
+          "required": true
+        },
+        {
+          "name": "description",
+          "label": "Description",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "heroImage",
+          "label": "Hero Image",
+          "type": "image"
+        },
+        {
+          "name": "body",
+          "label": "Content",
+          "type": "rich-text"
+        }
+      ]
+    }
+  ],
+  "media": {
+    "input": "public/images",
+    "output": "/images"
+  }
+}
