@@ -1,81 +1,47 @@
 {
-  "cms": {
-    "name": "Marketing Blog CMS",
-    "logo": "/images/logo.png",
-    "theme": {
-      "primary": "#007bff",
-      "secondary": "#6c757d"
-    }
-  },
-  "collections": {
-    "blog": {
-      "name": "Blog Posts",
-      "description": "Manage blog posts with frontmatter",
+  "items": [
+    {
+      "name": "blog",
+      "label": "Blog Posts",
+      "type": "collection",
       "path": "src/content/blog",
+      "format": "md",
       "fields": [
         {
           "name": "title",
           "label": "Title",
-          "type": "text",
-          "required": true,
-          "validation": {
-            "minLength": 1,
-            "maxLength": 200
-          }
+          "type": "string",
+          "required": true
         },
         {
           "name": "pubDate",
           "label": "Publication Date",
           "type": "date",
-          "required": true,
-          "format": "YYYY-MM-DD"
+          "required": true
         },
         {
           "name": "description",
           "label": "Description",
-          "type": "textarea",
-          "required": true,
-          "validation": {
-            "minLength": 10,
-            "maxLength": 500
-          }
+          "type": "text",
+          "required": true
         },
         {
           "name": "heroImage",
           "label": "Hero Image",
           "type": "image",
-          "required": false,
-          "path": "public/images",
-          "help": "Upload hero images to public/images/ directory"
-        },
-        {
-          "name": "tags",
-          "label": "Tags",
-          "type": "tags",
-          "required": false,
-          "help": "Add tags for categorization"
+          "path": "public/images"
         },
         {
           "name": "body",
           "label": "Content",
-          "type": "markdown",
-          "required": true,
-          "help": "Write your post content here using Markdown."
+          "type": "rich-text",
+          "required": true
         }
-      ],
-      "view": {
-        "default": "table",
-        "fields": ["title", "pubDate", "tags"]
-      }
+      ]
     }
-  },
+  ],
   "media": {
     "input": "public/images",
-    "output": "/images",
-    "extensions": ["jpg", "jpeg", "png", "gif", "webp"]
-  },
-  "git": {
-    "autoCommit": true,
-    "commitMessage": "CMS: Update content"
+    "output": "/images"
   }
 }
