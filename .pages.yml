@@ -40,7 +40,7 @@
     {
       "name": "home",
       "label": "Home Page",
-      "type": "collection",
+      "type": "file",
       "path": "src/content/home",
       "format": "yaml-frontmatter",
       "fields": [
@@ -65,7 +65,7 @@
     {
       "name": "about",
       "label": "About Page",
-      "type": "collection",
+      "type": "file",
       "path": "src/content/about",
       "format": "yaml-frontmatter",
       "fields": [
