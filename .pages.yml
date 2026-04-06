@@ -1,11 +1,11 @@
 {
-  "items": [
+  "content": [
     {
       "name": "blog",
       "label": "Blog Posts",
       "type": "collection",
       "path": "src/content/blog",
-      "format": "md",
+      "format": "yaml-frontmatter",
       "fields": [
         {
           "name": "title",
@@ -15,7 +15,7 @@
         },
         {
           "name": "pubDate",
-          "label": "Publication Date",
+          "label": "Date",
           "type": "date",
           "required": true
         },
@@ -28,14 +28,12 @@
         {
           "name": "heroImage",
           "label": "Hero Image",
-          "type": "image",
-          "path": "public/images"
+          "type": "image"
         },
         {
           "name": "body",
           "label": "Content",
-          "type": "rich-text",
-          "required": true
+          "type": "rich-text"
         }
       ]
     }
