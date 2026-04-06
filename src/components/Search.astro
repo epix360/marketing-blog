@@ -21,14 +21,18 @@
 		// Only try to load Pagefind in production or after build
 		if (import.meta.env.PROD) {
 			try {
-				const pagefind = await import('/pagefind/pagefind.js');
+				// Use dynamic import with Vite ignore to prevent build-time resolution
+				const pagefindModule = await import(/* @vite-ignore */ '/pagefind/pagefind.js');
+				const pagefind = pagefindModule.default || pagefindModule;
 				
 				const searchInput = document.getElementById('search-input');
 				const searchResults = document.getElementById('search-results');
 				
+				if (!searchInput || !searchResults) return;
+				
 				let searchTimeout;
 				
-				searchInput?.addEventListener('input', async (e) => {
+				searchInput.addEventListener('input', async (e) => {
 					const query = e.target?.value?.trim() || '';
 					
 					if (searchTimeout) {
