@@ -18,66 +18,133 @@
 <script>
 	// Load Pagefind after the page loads
 	async function loadPagefind() {
-		try {
-			const pagefind = await import('/pagefind/pagefind.js');
-			
+		// Only try to load Pagefind in production or after build
+		if (import.meta.env.PROD) {
+			try {
+				const pagefind = await import('/pagefind/pagefind.js');
+				
+				const searchInput = document.getElementById('search-input');
+				const searchResults = document.getElementById('search-results');
+				
+				let searchTimeout;
+				
+				searchInput?.addEventListener('input', async (e) => {
+					const query = e.target?.value?.trim() || '';
+					
+					if (searchTimeout) {
+						clearTimeout(searchTimeout);
+					}
+					
+					if (query.length < 2) {
+						searchResults.style.display = 'none';
+						return;
+					}
+					
+					// Debounce search
+					searchTimeout = setTimeout(async () => {
+						try {
+							const results = await pagefind.search(query);
+							
+							if (results.results.length > 0) {
+								const resultHtml = results.results.map(result => `
+									<div style="margin-bottom: 1rem; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px;">
+										<h4 style="margin: 0 0 0.25rem 0;">
+											<a href="${result.url}" style="text-decoration: none; color: inherit;">
+												${result.data?.meta?.title || result.url}
+											</a>
+										</h4>
+										<p style="margin: 0; font-size: 0.875rem; color: #666;">
+											${result.data?.meta?.description || result.url}
+										</p>
+									</div>
+								`).join('');
+								
+								searchResults.innerHTML = resultHtml;
+								searchResults.style.display = 'block';
+							} else {
+								searchResults.innerHTML = '<p style="padding: 0.5rem;">No results found.</p>';
+								searchResults.style.display = 'block';
+							}
+						} catch (error) {
+							console.error('Search error:', error);
+						}
+					}, 300);
+				});
+				
+				// Hide results when clicking outside
+				document.addEventListener('click', (e) => {
+					if (!searchInput?.contains(e.target) && !searchResults?.contains(e.target)) {
+						searchResults.style.display = 'none';
+					}
+				});
+			} catch (error) {
+				console.error('Failed to load Pagefind:', error);
+			}
+		} else {
+			// Development fallback
 			const searchInput = document.getElementById('search-input');
 			const searchResults = document.getElementById('search-results');
 			
-			let searchTimeout;
-			
-			searchInput?.addEventListener('input', async (e) => {
-				const query = e.target.value.trim();
+			if (searchInput && searchResults) {
+				let searchTimeout;
 				
-				if (searchTimeout) {
-					clearTimeout(searchTimeout);
-				}
-				
-				if (query.length < 2) {
-					searchResults.style.display = 'none';
-					return;
-				}
-				
-				// Debounce search
-				searchTimeout = setTimeout(async () => {
-					try {
-						const results = await pagefind.search(query);
-						
-						if (results.results.length > 0) {
-							const resultHtml = results.results.map(result => `
-								<div style="margin-bottom: 1rem; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px;">
-									<h4 style="margin: 0 0 0.25rem 0;">
-										<a href="${result.url}" style="text-decoration: none; color: inherit;">
-											${result.data?.meta?.title || result.url}
-										</a>
-									</h4>
-									<p style="margin: 0; font-size: 0.875rem; color: #666;">
-										${result.data?.meta?.description || result.url}
-									</p>
-								</div>
-							`).join('');
+				searchInput.addEventListener('input', async (e) => {
+					const query = e.target?.value?.trim() || '';
+					
+					if (searchTimeout) {
+						clearTimeout(searchTimeout);
+					}
+					
+					if (query.length < 2) {
+						searchResults.style.display = 'none';
+						return;
+					}
+					
+					// Debounce search
+					searchTimeout = setTimeout(async () => {
+						try {
+							// Simulate search results for development
+							const results = [
+								{ url: '/marketing-blog/blog/hello-world', data: { meta: { title: 'Hello World', description: 'Welcome to my new marketing blog!' } } },
+								{ url: '/marketing-blog/blog/digital-marketing-2026', data: { meta: { title: 'Digital Marketing Strategies for 2026', description: 'Explore the latest digital marketing trends and strategies.' } } },
+								{ url: '/marketing-blog/blog/content-creation-tips', data: { meta: { title: 'Content Creation Tips for Beginners', description: 'Essential tips and tricks for creating engaging content.' } } }
+							];
 							
-							searchResults.innerHTML = resultHtml;
-							searchResults.style.display = 'block';
-						} else {
-							searchResults.innerHTML = '<p style="padding: 0.5rem;">No results found.</p>';
+							if (results.length > 0) {
+								const resultHtml = results.map(result => `
+									<div style="margin-bottom: 1rem; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px;">
+										<h4 style="margin: 0 0 0.25rem 0;">
+											<a href="${result.url}" style="text-decoration: none; color: inherit;">
+												${result.data?.meta?.title || result.url}
+											</a>
+										</h4>
+										<p style="margin: 0; font-size: 0.875rem; color: #666;">
+											${result.data?.meta?.description || result.url}
+										</p>
+									</div>
+								`).join('');
+								
+								searchResults.innerHTML = resultHtml;
+								searchResults.style.display = 'block';
+							} else {
+								searchResults.innerHTML = '<p style="padding: 0.5rem;">No results found.</p>';
+								searchResults.style.display = 'block';
+							}
+						} catch (error) {
+							console.error('Search error:', error);
+							searchResults.innerHTML = '<p style="padding: 0.5rem;">Error searching.</p>';
 							searchResults.style.display = 'block';
 						}
-					} catch (error) {
-						console.error('Search error:', error);
+					}, 300);
+				});
+				
+				// Hide results when clicking outside
+				document.addEventListener('click', (e) => {
+					if (!searchInput?.contains(e.target) && !searchResults?.contains(e.target)) {
+						searchResults.style.display = 'none';
 					}
-				}, 300);
-			});
-			
-			// Hide results when clicking outside
-			document.addEventListener('click', (e) => {
-				if (!searchInput?.contains(e.target) && !searchResults?.contains(e.target)) {
-					searchResults.style.display = 'none';
-				}
-			});
-			
-		} catch (error) {
-			console.error('Failed to load Pagefind:', error);
+				});
+			}
 		}
 	}
 	
