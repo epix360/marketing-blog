@@ -70,9 +70,9 @@
     }
   },
   "media": {
-    "path": "public/images",
-    "allowedTypes": ["jpg", "jpeg", "png", "gif", "webp"],
-    "maxSize": "5MB"
+    "input": "public/images",
+    "output": "/images",
+    "extensions": ["jpg", "jpeg", "png", "gif", "webp"]
   },
   "git": {
     "autoCommit": true,
