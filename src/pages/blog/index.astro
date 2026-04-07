@@ -1,10 +1,37 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection, type CollectionEntry } from 'astro:content';
+import fs from 'fs/promises';
+import { join } from 'path';
 
-// Get blog index content from CMS
-const blogIndexContent = await getCollection('blogIndex');
-const blogIndexData = blogIndexContent[0]; // Get the first (and only) blog index content
+// Get blog index content from individual file
+let blogIndexTitle = "Blog - Marketing Blog";
+let blogIndexDescription = "Read the latest articles on digital marketing, content creation, SEO, and more.";
+let blogIndexData = null;
+
+try {
+	const contentPath = join(process.cwd(), 'src/content/blogIndex/index.md');
+	const fileContent = await fs.readFile(contentPath, 'utf-8');
+	
+	// Parse frontmatter and content
+	const frontmatterMatch = fileContent.match(/^---\n([\s\S]*?)\n---/);
+	if (frontmatterMatch) {
+		const frontmatter = frontmatterMatch[1];
+		const body = fileContent.replace(/^---\n[\s\S]*?\n---\n/, '');
+		
+		// Simple frontmatter parsing
+		const titleMatch = frontmatter.match(/title:\s*"([^"]+)"/);
+		
+		blogIndexData = {
+			data: {
+				title: titleMatch?.[1] || blogIndexTitle,
+				body: body.trim()
+			}
+		};
+	}
+} catch (error) {
+	console.warn('Could not load blog index content:', error);
+}
 
 // Get blog posts
 const blogPosts = await getCollection('blog');
@@ -22,18 +49,17 @@ function formatDate(date: Date): string {
 	});
 }
 
-// Fallback content if CMS content is not available
-const title = blogIndexData?.data?.title || "Blog - Marketing Blog";
-const description = blogIndexData?.data?.body || "Read the latest articles on digital marketing, content creation, SEO, and more.";
-const rendered = blogIndexData?.rendered;
+// Use CMS content if available
+const title = blogIndexData?.data?.title || blogIndexTitle;
+const description = blogIndexData?.data?.body || blogIndexDescription;
 ---
 
 <BaseLayout 
 	title={title}
 	description={description}
 >
-	{rendered ? (
-		<div set:html={rendered.html} />
+	{blogIndexData ? (
+		<div set:html={blogIndexData.data.body} />
 	) : (
 		<h1>Blog Posts</h1>
 	)}

@@ -1,16 +1,40 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { getCollection, type CollectionEntry } from 'astro:content';
+import fs from 'fs/promises';
+import { join } from 'path';
 
-// Get about page content from CMS
-const aboutContent = await getCollection('about');
-const aboutData = aboutContent[0]; // Get the first (and only) about page content
+// Get about page content from individual file
+let aboutData = null;
+try {
+	const contentPath = join(process.cwd(), 'src/content/about/index.md');
+	const fileContent = await fs.readFile(contentPath, 'utf-8');
+	
+	// Parse frontmatter and content
+	const frontmatterMatch = fileContent.match(/^---\n([\s\S]*?)\n---/);
+	if (frontmatterMatch) {
+		const frontmatter = frontmatterMatch[1];
+		const body = fileContent.replace(/^---\n[\s\S]*?\n---\n/, '');
+		
+		// Simple frontmatter parsing
+		const titleMatch = frontmatter.match(/title:\s*"([^"]+)"/);
+		const heroImageMatch = frontmatter.match(/heroImage:\s*"([^"]+)"/);
+		
+		aboutData = {
+			data: {
+				title: titleMatch?.[1] || "About - Marketing Blog",
+				body: body.trim(),
+				heroImage: heroImageMatch?.[1]
+			}
+		};
+	}
+} catch (error) {
+	console.warn('Could not load about content:', error);
+}
 
-// Fallback content if CMS content is not available
+// Use CMS content if available
 const title = aboutData?.data?.title || "About - Marketing Blog";
 const description = aboutData?.data?.body || "Learn about this marketing blog built with Astro and Pico CSS. Discover the technologies and features used.";
 const heroImage = aboutData?.data?.heroImage;
-const rendered = aboutData?.rendered;
 ---
 
 <BaseLayout 
@@ -22,8 +46,8 @@ const rendered = aboutData?.rendered;
 		<img src={heroImage} alt="Hero image" style="width: 100%; max-height: 400px; object-fit: cover; border-radius: 8px; margin-bottom: 2rem;">
 	)}
 	
-	{rendered ? (
-		<div set:html={rendered.html} />
+	{aboutData ? (
+		<div set:html={aboutData.data.body} />
 	) : (
 		<>
 			<h1>About This Blog</h1>
