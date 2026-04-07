@@ -1,10 +1,10 @@
 ---
-title: "Content Creation Tips for Beginners"
+title: Content Creation Tips for Beginners
 pubDate: 2026-04-04
-description: "Essential tips and tricks for creating engaging content that resonates with your audience."
-tags: ["content-creation", "beginners", "tips"]
+description: Essential tips and tricks for creating engaging content that
+  resonates with your audience.
+heroImage: /images/Gemini_Generated_Image_e50h3ze50h3ze50h.webp
 ---
-
 # Content Creation Tips for Beginners
 
 Creating compelling content is both an art and a science. Here are some essential tips to get started.
