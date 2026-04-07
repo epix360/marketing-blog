@@ -1,7 +1,7 @@
 ---
-title: "Blog Posts"
-body: |
-  # Blog Posts
+title: Blog Posts
+---
+# Blog Posts
   
   Welcome to our blog! Here you'll find the latest articles on digital marketing, content creation, SEO, and more.
   
@@ -23,4 +23,3 @@ body: |
   Check back regularly for new content, or better yet, subscribe to our newsletter to get the latest posts delivered directly to your inbox.
   
   Happy reading, and may your marketing efforts be successful!
----
