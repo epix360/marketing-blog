@@ -49,6 +49,15 @@ function markdownToHtml(markdown: string): string {
 // Image mapping function
 function getImageSrc(imagePath: string) {
 	const imageName = imagePath.replace('/images/', '');
+	
+	// Handle new .webp images from public/images/
+	if (imageName.endsWith('.webp')) {
+		// Return null to indicate this is a public folder image
+		// that should be referenced by URL, not imported
+		return null;
+	}
+	
+	// Handle legacy .jpg images from src/assets/images/
 	switch(imageName) {
 		case 'hero-home.jpg':
 			return heroHomeImage;
@@ -66,6 +75,9 @@ function getImageSrc(imagePath: string) {
 // Get home page content from individual file
 let homeData = null;
 let heroImageSrc = null;
+let heroImageIsPublic = false;
+let publicImagePath = null;
+
 try {
 	const contentPath = join(process.cwd(), 'src/content/home/index.md');
 	const fileContent = await fs.readFile(contentPath, 'utf-8');
@@ -80,11 +92,23 @@ try {
 			
 			// Simple frontmatter parsing
 			const titleMatch = frontmatter.match(/title:\s*"([^"]+)"/);
-			const heroImageMatch = frontmatter.match(/heroImage:\s*"([^"]+)"/);
+			const heroImageMatch = frontmatter.match(/heroImage:\s*(?:"([^"]+)"|([^\n]+))/);
 			
-			// Handle hero image path
-			let heroImagePath = heroImageMatch?.[1] || "/images/hero-home.jpg";
-			heroImageSrc = getImageSrc(heroImagePath);
+			// Handle hero image path (check both capture groups for quoted/unquoted)
+			const heroImagePath = heroImageMatch?.[1] || heroImageMatch?.[2]?.trim() || "/images/hero-home.jpg";
+			const imageName = heroImagePath.replace('/images/', '');
+			
+			// Check if this is a public folder webp image
+			if (imageName.endsWith('.webp')) {
+				heroImageIsPublic = true;
+				publicImagePath = heroImagePath;
+				heroImageSrc = null;
+			} else {
+				// Legacy imported image
+				heroImageIsPublic = false;
+				publicImagePath = null;
+				heroImageSrc = getImageSrc(heroImagePath);
+			}
 			
 			homeData = {
 				data: {
@@ -99,6 +123,8 @@ try {
 	console.warn('Could not load home content:', error);
 	// Fallback to default hero image
 	heroImageSrc = heroHomeImage;
+	heroImageIsPublic = false;
+	publicImagePath = null;
 }
 
 // Use CMS content if available
@@ -108,6 +134,7 @@ const heroImage = homeData?.data?.heroImage;
 const content = homeData?.data?.body || "";
 
 const renderedContent = content ? markdownToHtml(content) : "";
+
 ---
 
 <BaseLayout 
@@ -115,7 +142,7 @@ const renderedContent = content ? markdownToHtml(content) : "";
 	description={description}
 	image={heroImage}
 >
-	{heroImageSrc && (
+	{heroImageSrc && !heroImageIsPublic && (
 		<Image 
 			src={heroImageSrc} 
 			alt="Hero image" 
@@ -123,6 +150,15 @@ const renderedContent = content ? markdownToHtml(content) : "";
 			height={400}
 			format="webp"
 			quality={80}
+			loading="eager"
+			style="width: 100%; max-height: 400px; object-fit: cover; border-radius: 8px; margin-bottom: 2rem;"
+		/>
+	)}
+	
+	{heroImageIsPublic && publicImagePath && (
+		<img 
+			src={publicImagePath} 
+			alt="Hero image" 
 			loading="eager"
 			style="width: 100%; max-height: 400px; object-fit: cover; border-radius: 8px; margin-bottom: 2rem;"
 		/>
