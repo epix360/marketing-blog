@@ -5,41 +5,28 @@ import fs from 'fs/promises';
 import { join } from 'path';
 import { Image } from 'astro:assets';
 
-// Get blog index content from individual file
-let blogIndexTitle = "Blog - Marketing Blog";
-let blogIndexDescription = "Read the latest articles on digital marketing, content creation, SEO, and more.";
-let blogIndexData = null;
+// Import available images
+import heroHomeImage from '../../assets/images/hero-home.jpg';
+import heroAboutImage from '../../assets/images/hero-about.jpg';
+import batGeorgiaImage from '../../assets/images/Bat-Georgia.jpg';
+import angelc3poImage from '../../assets/images/angelc3po.jpg';
 
-try {
-	const contentPath = join(process.cwd(), 'src/content/blogIndex/index.md');
-	const fileContent = await fs.readFile(contentPath, 'utf-8');
-	
-	// Parse frontmatter and content
-	const frontmatterMatch = fileContent.match(/^---\n([\s\S]*?)\n---/);
-	if (frontmatterMatch) {
-		const frontmatter = frontmatterMatch[1];
-		const body = fileContent.replace(/^---\n[\s\S]*?\n---\n/, '');
-		
-		// Simple frontmatter parsing
-		const titleMatch = frontmatter.match(/title:\s*"([^"]+)"/);
-		
-		blogIndexData = {
-			data: {
-				title: titleMatch?.[1] || blogIndexTitle,
-				body: body.trim()
-			}
-		};
+// Image mapping function
+function getImageSrc(imagePath: string) {
+	const imageName = imagePath.replace('/images/', '');
+	switch(imageName) {
+		case 'hero-home.jpg':
+			return heroHomeImage;
+		case 'hero-about.jpg':
+			return heroAboutImage;
+		case 'Bat-Georgia.jpg':
+			return batGeorgiaImage;
+		case 'angelc3po.jpg':
+			return angelc3poImage;
+		default:
+			return heroHomeImage; // fallback
 	}
-} catch (error) {
-	console.warn('Could not load blog index content:', error);
 }
-
-// Get blog posts
-const blogPosts = await getCollection('blog');
-// Sort posts by publication date (newest first)
-const sortedPosts = blogPosts.sort((a: CollectionEntry<'blog'>, b: CollectionEntry<'blog'>) => 
-	new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime()
-);
 
 // Format date as "April 6, 2026"
 function formatDate(date: Date): string {
@@ -50,17 +37,108 @@ function formatDate(date: Date): string {
 	});
 }
 
-// Use CMS content if available
-const title = blogIndexData?.data?.title || blogIndexTitle;
-const description = blogIndexData?.data?.body || blogIndexDescription;
+// Get blog posts
+const blogPosts = await getCollection('blog');
+// Sort posts by publication date (newest first)
+const sortedPosts = blogPosts.sort((a: CollectionEntry<'blog'>, b: CollectionEntry<'blog'>) => 
+	new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime()
+);
+
+// Read blog index content directly
+let blogIndexTitle = "Blog - Marketing Blog";
+let blogIndexDescription = "Read the latest articles on digital marketing, content creation, SEO, and more.";
+let blogIndexContent = null;
+
+try {
+	const contentPath = join(process.cwd(), 'src/content/blogIndex/index.md');
+	const fileContent = await fs.readFile(contentPath, 'utf-8');
+	blogIndexContent = parseFrontmatter(fileContent);
+} catch (error) {
+	console.warn('Could not load blog index content:', error);
+}
+
+// Simple markdown to HTML converter
+function markdownToHtml(markdown: string): string {
+	let html = markdown;
+	
+	// Headers
+	html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+	html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+	html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+	
+	// Lists
+	html = html.replace(/^- (.+)$/gm, '<li>$1</li>');
+	html = html.replace(/^\* (.+)$/gm, '<li>$1</li>');
+	
+	// Bold and italic
+	html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+	html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+	
+	// Paragraphs
+	html = html.replace(/\n\n/g, '</p><p>');
+	html = html.replace(/\n/g, '<br>');
+	
+	// Wrap in paragraphs
+	const lines = html.split('<br>');
+	let result = '';
+	for (let i = 0; i < lines.length; i++) {
+		const line = lines[i].trim();
+		if (line && !line.startsWith('<') && !line.startsWith('</')) {
+			result += '<p>' + line + '</p>';
+		} else {
+			result += line;
+		}
+	}
+	
+	return result;
+}
+
+// Parse frontmatter from content
+function parseFrontmatter(content: string): { title?: string; body?: string } {
+	const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/s);
+	if (frontmatterMatch) {
+		const frontmatter = frontmatterMatch[1];
+		const body = content.replace(/^---\n[\s\S]*?\n---\n/s, '');
+		
+		// Simple frontmatter parsing
+		const titleMatch = frontmatter.match(/title:\s*"([^"]+)"/);
+		
+		return {
+			title: titleMatch?.[1] || '',
+			body: body.trim()
+		};
+	} else {
+		return { body: content.trim() };
+	}
+}
+
+// Parse frontmatter from content
+function parseFrontmatter(content: string): { title?: string; body?: string } {
+	const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/s);
+	if (frontmatterMatch) {
+		const frontmatter = frontmatterMatch[1];
+		const body = content.replace(/^---\n[\s\S]*?\n---\n/s, '');
+		
+		// Simple frontmatter parsing
+		const titleMatch = frontmatter.match(/title:\s*"([^"]+)"/);
+		
+		return {
+			title: titleMatch?.[1] || '',
+			body: body.trim()
+		};
+	} else {
+		return { body: content.trim() };
+	}
+}
+
 ---
 
 <BaseLayout 
 	title={title}
-	description={description}
+	description={blogIndexDescription}
 >
 	{blogIndexData ? (
-		<div set:html={blogIndexData.data.body} />
+		<div set:html={renderedContent} />
 	) : (
 		<h1>Blog Posts</h1>
 	)}

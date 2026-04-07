@@ -8,6 +8,7 @@ import { Image } from 'astro:assets';
 import heroHomeImage from '../assets/images/hero-home.jpg';
 import heroAboutImage from '../assets/images/hero-about.jpg';
 import batGeorgiaImage from '../assets/images/Bat-Georgia.jpg';
+import angelc3poImage from '../assets/images/angelc3po.jpg';
 
 // Simple markdown to HTML converter
 function markdownToHtml(markdown: string): string {
@@ -55,6 +56,8 @@ function getImageSrc(imagePath: string) {
 			return heroAboutImage;
 		case 'Bat-Georgia.jpg':
 			return batGeorgiaImage;
+		case 'angelc3po.jpg':
+			return angelc3poImage;
 		default:
 			return heroHomeImage; // fallback
 	}
