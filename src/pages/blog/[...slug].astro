@@ -147,20 +147,7 @@ const processedContent = post.body ? processMarkdownContent(post.body) : '';
 	publishedDate={post.data.pubDate}
 >
 	<article>
-		<header>
-			<h1>{post.data.title}</h1>
-			<p><em>{post.data.description}</em></p>
-			<time datetime={post.data.pubDate.toISOString()}>
-				Published on {formatDate(post.data.pubDate)}
-			</time>
-			{post.data.tags && post.data.tags.length > 0 && (
-				<p>
-					<strong>Tags:</strong> {post.data.tags.join(', ')}
-				</p>
-			)}
-		</header>
-		
-		<div class="post-layout">
+		<header class="post-header">
 			{postImageSrc && !postImageIsPublic && (
 				<Image 
 					src={postImageSrc} 
@@ -170,7 +157,7 @@ const processedContent = post.body ? processMarkdownContent(post.body) : '';
 					format="webp"
 					quality={80}
 					loading="eager"
-					class="post-image"
+					class="header-image"
 				/>
 			)}
 			
@@ -179,12 +166,25 @@ const processedContent = post.body ? processMarkdownContent(post.body) : '';
 					src={publicPostImagePath} 
 					alt={post.data.title}
 					loading="eager"
-					class="post-image"
+					class="header-image"
 				/>
 			)}
 			
-			<div class="post-content" set:html={processedContent} />
-		</div>
+			<div class="header-content">
+				<h1>{post.data.title}</h1>
+				<p><em>{post.data.description}</em></p>
+				<time datetime={post.data.pubDate.toISOString()}>
+					Published on {formatDate(post.data.pubDate)}
+				</time>
+				{post.data.tags && post.data.tags.length > 0 && (
+					<p>
+						<strong>Tags:</strong> {post.data.tags.join(', ')}
+					</p>
+				)}
+			</div>
+		</header>
+		
+		<div class="post-content" set:html={processedContent} />
 		
 		<footer>
 			<p>
@@ -195,38 +195,47 @@ const processedContent = post.body ? processMarkdownContent(post.body) : '';
 </BaseLayout>
 
 <style>
-	.post-layout {
-		overflow: hidden;
-		margin-top: 1.5rem;
+	.post-header {
+		display: flex;
+		gap: 1.5rem;
+		align-items: flex-start;
+		margin-bottom: 2rem;
 	}
 	
-	:global(.post-image) {
+	:global(.header-image) {
 		width: 400px;
 		height: 400px;
 		object-fit: cover;
 		border-radius: 8px;
-		float: left;
-		margin: 0 1.5rem 1rem 0;
+		flex-shrink: 0;
 	}
 	
-	:global(.post-content) {
-		overflow: hidden;
+	.header-content {
+		flex: 1;
+		min-width: 0;
 	}
 	
-	/* Mobile: stack above text */
+	.header-content h1 {
+		margin-top: 0;
+	}
+	
+	/* Mobile: stack vertically */
 	@media (max-width: 768px) {
-		:global(.post-image) {
-			float: none;
+		.post-header {
+			flex-direction: column;
+			align-items: center;
+		}
+		
+		:global(.header-image) {
 			width: 100%;
 			max-width: 400px;
 			height: auto;
 			aspect-ratio: 1;
-			margin: 0 auto 1rem auto;
-			display: block;
 		}
 		
-		:global(.post-content) {
-			overflow: visible;
+		.header-content {
+			width: 100%;
+			text-align: center;
 		}
 	}
 </style>
