@@ -3,7 +3,7 @@ title: Content Creation Tips for Beginners
 pubDate: 2026-04-04
 description: Essential tips and tricks for creating engaging content that
   resonates with your audience.
-heroImage: /images/Gemini_Generated_Image_e50h3ze50h3ze50h.webp
+postImage: /images/Gemini_Generated_Image_e50h3ze50h3ze50h.webp
 ---
 # Content Creation Tips for Beginners
 
