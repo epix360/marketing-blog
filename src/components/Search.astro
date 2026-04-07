@@ -22,7 +22,7 @@
 		if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
 			try {
 				// Use dynamic import with Vite ignore to prevent build-time resolution
-				const pagefindModule = await import(/* @vite-ignore */ '/pagefind/pagefind.js');
+				const pagefindModule = await import(/* @vite-ignore */ '/marketing-blog/pagefind/pagefind.js');
 				const pagefind = pagefindModule.default || pagefindModule;
 				
 				const searchInput = document.getElementById('search-input');
