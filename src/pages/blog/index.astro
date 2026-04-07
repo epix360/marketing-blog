@@ -112,24 +112,9 @@ function parseFrontmatter(content: string): { title?: string; body?: string } {
 	}
 }
 
-// Parse frontmatter from content
-function parseFrontmatter(content: string): { title?: string; body?: string } {
-	const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/s);
-	if (frontmatterMatch) {
-		const frontmatter = frontmatterMatch[1];
-		const body = content.replace(/^---\n[\s\S]*?\n---\n/s, '');
-		
-		// Simple frontmatter parsing
-		const titleMatch = frontmatter.match(/title:\s*"([^"]+)"/);
-		
-		return {
-			title: titleMatch?.[1] || '',
-			body: body.trim()
-		};
-	} else {
-		return { body: content.trim() };
-	}
-}
+// Define variables for template
+const title = blogIndexContent?.title || blogIndexTitle;
+const renderedContent = blogIndexContent?.body ? markdownToHtml(blogIndexContent.body) : '';
 
 ---
 
@@ -137,7 +122,7 @@ function parseFrontmatter(content: string): { title?: string; body?: string } {
 	title={title}
 	description={blogIndexDescription}
 >
-	{blogIndexData ? (
+	{blogIndexContent?.body ? (
 		<div set:html={renderedContent} />
 	) : (
 		<h1>Blog Posts</h1>
