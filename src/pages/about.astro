@@ -24,6 +24,47 @@ function getImageSrc(imagePath: string) {
 	}
 }
 
+// Simple markdown to HTML converter
+function markdownToHtml(markdown: string | undefined): string {
+	// Guard clause for undefined/null content
+	if (!markdown || typeof markdown !== 'string') {
+		return '';
+	}
+	
+	let html = markdown;
+	
+	// Headers
+	html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+	html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+	html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+	
+	// Lists
+	html = html.replace(/^(\s*)- (.+)$/gm, '<li>$2</li>');
+	html = html.replace(/^(\s*)\* (.+)$/gm, '<li>$2</li>');
+	
+	// Bold and italic
+	html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+	html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+	
+	// Paragraphs
+	html = html.replace(/\n\n/g, '</p><p>');
+	html = html.replace(/\n/g, '<br>');
+	
+	// Wrap in paragraphs
+	const lines = html.split('<br>');
+	let result = '';
+	for (let i = 0; i < lines.length; i++) {
+		const line = lines[i].trim();
+		if (line && !line.startsWith('<') && !line.startsWith('</')) {
+			result += '<p>' + line + '</p>';
+		} else {
+			result += line;
+		}
+	}
+	
+	return result;
+}
+
 // Get about page content from individual file
 let aboutData = null;
 let heroImageSrc = null;
@@ -80,6 +121,9 @@ try {
 const title = aboutData?.data?.title || "About - Marketing Blog";
 const description = aboutData?.data?.body || "Learn about this marketing blog built with Astro and Pico CSS. Discover the technologies and features used.";
 const heroImage = aboutData?.data?.heroImage;
+
+// Process markdown content
+const processedBody = aboutData?.data?.body ? markdownToHtml(aboutData.data.body) : '';
 ---
 
 <BaseLayout 
@@ -110,7 +154,7 @@ const heroImage = aboutData?.data?.heroImage;
 	)}
 	
 	{aboutData ? (
-		<div set:html={aboutData.data.body} />
+		<div set:html={processedBody} />
 	) : (
 		<>
 			<h1>About This Blog</h1>
