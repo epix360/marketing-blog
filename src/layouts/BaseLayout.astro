@@ -42,18 +42,18 @@ const currentYear = new Date().getFullYear();
 	</head>
 	<body>
 		<header>
-			<nav>
+			<nav style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
 				<ul>
 					<li><strong>Marketing Blog</strong></li>
 				</ul>
-				<ul>
+				<Search />
+				<ul style="display: flex; gap: 1rem; margin: 0; padding: 0; list-style: none;">
 					<li><a href={import.meta.env.BASE_URL}>Home</a></li>
 					<li><a href={`${import.meta.env.BASE_URL}blog`}>Blog</a></li>
 					<li><a href={`${import.meta.env.BASE_URL}about`}>About</a></li>
 					<li><a href={`${import.meta.env.BASE_URL}contact`}>Contact</a></li>
 				</ul>
 			</nav>
-			<Search />
 		</header>
 		
 		<main class="container">
