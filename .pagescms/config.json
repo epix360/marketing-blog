@@ -4,7 +4,7 @@
       "name": "home",
       "label": "Home Page",
       "type": "file",
-      "path": "src/content/home",
+      "path": "src/content/home/index.md",
       "format": "yaml-frontmatter",
       "fields": [
         {
@@ -29,7 +29,7 @@
       "name": "about",
       "label": "About Page",
       "type": "file",
-      "path": "src/content/about",
+      "path": "src/content/about/index.md",
       "format": "yaml-frontmatter",
       "fields": [
         {
@@ -54,7 +54,7 @@
       "name": "blogIndex",
       "label": "Blog Index",
       "type": "file",
-      "path": "src/content/home",
+      "path": "src/content/blogIndex/index.md",
       "format": "yaml-frontmatter",
       "fields": [
         {
