@@ -134,7 +134,7 @@ if (post.data.postImage) {
 }
 
 // Process content to handle images
-const processedContent = rendered ? processMarkdownContent(rendered.markdown) : '';
+const processedContent = post.body ? processMarkdownContent(post.body) : '';
 
 ---
 
