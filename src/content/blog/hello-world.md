@@ -3,7 +3,7 @@ title: Hello World
 pubDate: 2026-04-06
 description: Welcome to my new marketing blog! This is the first post to test
   the content collection schema.
-heroImage: /images/Gemini_Generated_Image_e32orwe32orwe32o.webp
+postImage: /images/Gemini_Generated_Image_e32orwe32orwe32o.webp
 ---
 # Hello World!
 

@@ -112,24 +112,24 @@ interface Props {
 const { post }: Props = Astro.props;
 const rendered = post.rendered;
 
-// Process hero image
-let heroImageSrc = null;
-let heroImageIsPublic = false;
-let publicHeroImagePath = null;
+// Process post image
+let postImageSrc = null;
+let postImageIsPublic = false;
+let publicPostImagePath = null;
 
-if (post.data.heroImage) {
-	const imageName = post.data.heroImage.replace('/images/', '');
+if (post.data.postImage) {
+	const imageName = post.data.postImage.replace('/images/', '');
 	
 	// Check if this is a public folder webp image
 	if (imageName.endsWith('.webp')) {
-		heroImageIsPublic = true;
-		publicHeroImagePath = '/marketing-blog' + post.data.heroImage;
-		heroImageSrc = null;
+		postImageIsPublic = true;
+		publicPostImagePath = '/marketing-blog' + post.data.postImage;
+		postImageSrc = null;
 	} else {
 		// Legacy imported image
-		heroImageIsPublic = false;
-		publicHeroImagePath = null;
-		heroImageSrc = getImageSrc(post.data.heroImage);
+		postImageIsPublic = false;
+		publicPostImagePath = null;
+		postImageSrc = getImageSrc(post.data.postImage);
 	}
 }
 
@@ -141,7 +141,7 @@ const processedContent = rendered ? processMarkdownContent(rendered.markdown) : 
 <BaseLayout 
 	title={post.data.title}
 	description={post.data.description}
-	image={post.data.heroImage}
+	image={post.data.postImage}
 	type="article"
 	tags={post.data.tags}
 	publishedDate={post.data.pubDate}
@@ -160,33 +160,31 @@ const processedContent = rendered ? processMarkdownContent(rendered.markdown) : 
 			)}
 		</header>
 		
-		{heroImageSrc && !heroImageIsPublic && (
-			<Image 
-				src={heroImageSrc} 
-				alt={post.data.title} 
-				width={1200} 
-				height={600}
-				format="webp"
-				quality={80}
-				loading="eager"
-				style="width: 100%; max-height: 600px; object-fit: cover; border-radius: 8px; margin: 2rem 0;"
-			/>
-		)}
-		
-		{heroImageIsPublic && publicHeroImagePath && (
-			<img 
-				src={publicHeroImagePath} 
-				alt={post.data.title} 
-				loading="eager"
-				style="width: 100%; max-height: 600px; object-fit: cover; border-radius: 8px; margin: 2rem 0;"
-			/>
-		)}
-		
-		<hr />
-		
-		<section>
-			<div set:html={processedContent} />
-		</section>
+		<div class="post-layout">
+			{postImageSrc && !postImageIsPublic && (
+				<Image 
+					src={postImageSrc} 
+					alt={post.data.title}
+					width={400}
+					height={400}
+					format="webp"
+					quality={80}
+					loading="eager"
+					class="post-image"
+				/>
+			)}
+			
+			{postImageIsPublic && publicPostImagePath && (
+				<img 
+					src={publicPostImagePath} 
+					alt={post.data.title}
+					loading="eager"
+					class="post-image"
+				/>
+			)}
+			
+			<div class="post-content" set:html={processedContent} />
+		</div>
 		
 		<footer>
 			<p>
@@ -195,3 +193,40 @@ const processedContent = rendered ? processMarkdownContent(rendered.markdown) : 
 		</footer>
 	</article>
 </BaseLayout>
+
+<style>
+	.post-layout {
+		overflow: hidden;
+		margin-top: 1.5rem;
+	}
+	
+	:global(.post-image) {
+		width: 400px;
+		height: 400px;
+		object-fit: cover;
+		border-radius: 8px;
+		float: left;
+		margin: 0 1.5rem 1rem 0;
+	}
+	
+	:global(.post-content) {
+		overflow: hidden;
+	}
+	
+	/* Mobile: stack above text */
+	@media (max-width: 768px) {
+		:global(.post-image) {
+			float: none;
+			width: 100%;
+			max-width: 400px;
+			height: auto;
+			aspect-ratio: 1;
+			margin: 0 auto 1rem auto;
+			display: block;
+		}
+		
+		:global(.post-content) {
+			overflow: visible;
+		}
+	}
+</style>

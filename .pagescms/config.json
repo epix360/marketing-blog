@@ -96,8 +96,8 @@
           "required": true
         },
         {
-          "name": "heroImage",
-          "label": "Hero Image",
+          "name": "postImage",
+          "label": "Post Image",
           "type": "image"
         },
         {
