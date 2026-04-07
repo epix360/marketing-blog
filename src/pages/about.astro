@@ -2,9 +2,31 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import fs from 'fs/promises';
 import { join } from 'path';
+import { Image } from 'astro:assets';
+
+// Import available images
+import heroHomeImage from '../assets/images/hero-home.jpg';
+import heroAboutImage from '../assets/images/hero-about.jpg';
+import batGeorgiaImage from '../assets/images/Bat-Georgia.jpg';
+
+// Image mapping function
+function getImageSrc(imagePath: string) {
+	const imageName = imagePath.replace('/images/', '');
+	switch(imageName) {
+		case 'hero-home.jpg':
+			return heroHomeImage;
+		case 'hero-about.jpg':
+			return heroAboutImage;
+		case 'Bat-Georgia.jpg':
+			return batGeorgiaImage;
+		default:
+			return heroAboutImage; // fallback
+	}
+}
 
 // Get about page content from individual file
 let aboutData = null;
+let heroImageSrc = null;
 try {
 	const contentPath = join(process.cwd(), 'src/content/about/index.md');
 	const fileContent = await fs.readFile(contentPath, 'utf-8');
@@ -19,6 +41,10 @@ try {
 		const titleMatch = frontmatter.match(/title:\s*"([^"]+)"/);
 		const heroImageMatch = frontmatter.match(/heroImage:\s*"([^"]+)"/);
 		
+		// Handle hero image path
+		let heroImagePath = heroImageMatch?.[1] || "/images/hero-about.jpg";
+		heroImageSrc = getImageSrc(heroImagePath);
+		
 		aboutData = {
 			data: {
 				title: titleMatch?.[1] || "About - Marketing Blog",
@@ -29,6 +55,8 @@ try {
 	}
 } catch (error) {
 	console.warn('Could not load about content:', error);
+	// Fallback to default hero image
+	heroImageSrc = heroAboutImage;
 }
 
 // Use CMS content if available
@@ -42,8 +70,17 @@ const heroImage = aboutData?.data?.heroImage;
 	description={description}
 	image={heroImage}
 >
-	{heroImage && (
-		<img src={heroImage} alt="Hero image" style="width: 100%; max-height: 400px; object-fit: cover; border-radius: 8px; margin-bottom: 2rem;">
+	{heroImageSrc && (
+		<Image 
+			src={heroImageSrc} 
+			alt="Hero image" 
+			width={1200} 
+			height={400}
+			format="webp"
+			quality={80}
+			loading="eager"
+			style="width: 100%; max-height: 400px; object-fit: cover; border-radius: 8px; margin-bottom: 2rem;"
+		/>
 	)}
 	
 	{aboutData ? (

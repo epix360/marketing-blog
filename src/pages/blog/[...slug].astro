@@ -2,6 +2,12 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 import type { CollectionEntry } from 'astro:content';
+import { Image } from 'astro:assets';
+
+// Import available images
+import heroHomeImage from '../../assets/images/hero-home.jpg';
+import heroAboutImage from '../../assets/images/hero-about.jpg';
+import batGeorgiaImage from '../../assets/images/Bat-Georgia.jpg';
 
 export async function getStaticPaths() {
 	const posts = await getCollection('blog');
@@ -20,12 +26,51 @@ function formatDate(date: Date): string {
 	});
 }
 
+// Image mapping function
+function getImageSrc(imagePath: string) {
+	const imageName = imagePath.replace('/images/', '');
+	switch(imageName) {
+		case 'hero-home.jpg':
+			return heroHomeImage;
+		case 'hero-about.jpg':
+			return heroAboutImage;
+		case 'Bat-Georgia.jpg':
+			return batGeorgiaImage;
+		default:
+			return batGeorgiaImage; // fallback
+	}
+}
+
+// Process markdown content to handle images with Astro Image component
+function processMarkdownImages(content: string): string {
+	return content.replace(
+		/!\[(.*?)\]\((.*?)\)/g,
+		(match, alt, src) => {
+			if (src.startsWith('/images/')) {
+				// For images in /images/ directory, we'll handle them differently
+				// This is a simplified approach - in production you'd want more robust handling
+				return `<img src="${src}" alt="${alt}" loading="lazy" style="max-width: 100%; height: auto; border-radius: 8px; margin: 1rem 0;">`;
+			}
+			return match;
+		}
+	);
+}
+
 interface Props {
 	post: CollectionEntry<'blog'>;
 }
 
 const { post }: Props = Astro.props;
 const rendered = post.rendered;
+
+// Process hero image
+let heroImageSrc = null;
+if (post.data.heroImage) {
+	heroImageSrc = getImageSrc(post.data.heroImage);
+}
+
+// Process content to handle images
+const processedContent = rendered ? processMarkdownImages(rendered.html) : '';
 ---
 
 <BaseLayout 
@@ -50,10 +95,23 @@ const rendered = post.rendered;
 			)}
 		</header>
 		
+		{heroImageSrc && (
+			<Image 
+				src={heroImageSrc} 
+				alt={post.data.title} 
+				width={1200} 
+				height={600}
+				format="webp"
+				quality={80}
+				loading="eager"
+				style="width: 100%; max-height: 600px; object-fit: cover; border-radius: 8px; margin: 2rem 0;"
+			/>
+		)}
+		
 		<hr />
 		
 		<section>
-			{rendered && <div set:html={rendered.html} />}
+			<div set:html={processedContent} />
 		</section>
 		
 		<footer>

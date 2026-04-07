@@ -2,6 +2,12 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import fs from 'fs/promises';
 import { join } from 'path';
+import { Image } from 'astro:assets';
+
+// Import available images
+import heroHomeImage from '../assets/images/hero-home.jpg';
+import heroAboutImage from '../assets/images/hero-about.jpg';
+import batGeorgiaImage from '../assets/images/Bat-Georgia.jpg';
 
 // Simple markdown to HTML converter
 function markdownToHtml(markdown: string): string {
@@ -39,13 +45,27 @@ function markdownToHtml(markdown: string): string {
 	return result;
 }
 
+// Image mapping function
+function getImageSrc(imagePath: string) {
+	const imageName = imagePath.replace('/images/', '');
+	switch(imageName) {
+		case 'hero-home.jpg':
+			return heroHomeImage;
+		case 'hero-about.jpg':
+			return heroAboutImage;
+		case 'Bat-Georgia.jpg':
+			return batGeorgiaImage;
+		default:
+			return heroHomeImage; // fallback
+	}
+}
+
 // Get home page content from individual file
 let homeData = null;
+let heroImageSrc = null;
 try {
 	const contentPath = join(process.cwd(), 'src/content/home/index.md');
 	const fileContent = await fs.readFile(contentPath, 'utf-8');
-	
-	console.log('Raw file content:', fileContent);
 	
 	// Parse frontmatter and content - handle multi-line frontmatter
 	const frontmatterStart = fileContent.indexOf('---');
@@ -55,13 +75,13 @@ try {
 			const frontmatter = fileContent.substring(frontmatterStart + 3, secondDashIndex);
 			const body = fileContent.substring(secondDashIndex + 3);
 			
-			console.log('Frontmatter extracted:', frontmatter);
-			console.log('Body extracted (raw):', body);
-			console.log('Body extracted (trimmed):', body.trim());
-			
 			// Simple frontmatter parsing
 			const titleMatch = frontmatter.match(/title:\s*"([^"]+)"/);
 			const heroImageMatch = frontmatter.match(/heroImage:\s*"([^"]+)"/);
+			
+			// Handle hero image path
+			let heroImagePath = heroImageMatch?.[1] || "/images/hero-home.jpg";
+			heroImageSrc = getImageSrc(heroImagePath);
 			
 			homeData = {
 				data: {
@@ -74,6 +94,8 @@ try {
 	}
 } catch (error) {
 	console.warn('Could not load home content:', error);
+	// Fallback to default hero image
+	heroImageSrc = heroHomeImage;
 }
 
 // Use CMS content if available
@@ -82,10 +104,7 @@ const description = homeData?.data?.body || "Welcome to my marketing blog! Explo
 const heroImage = homeData?.data?.heroImage;
 const content = homeData?.data?.body || "";
 
-console.log('Content loaded:', content);
-console.log('Home data:', homeData);
 const renderedContent = content ? markdownToHtml(content) : "";
-console.log('Rendered content:', renderedContent);
 ---
 
 <BaseLayout 
@@ -93,8 +112,17 @@ console.log('Rendered content:', renderedContent);
 	description={description}
 	image={heroImage}
 >
-	{heroImage && (
-		<img src={heroImage} alt="Hero image" style="width: 100%; max-height: 400px; object-fit: cover; border-radius: 8px; margin-bottom: 2rem;">
+	{heroImageSrc && (
+		<Image 
+			src={heroImageSrc} 
+			alt="Hero image" 
+			width={1200} 
+			height={400}
+			format="webp"
+			quality={80}
+			loading="eager"
+			style="width: 100%; max-height: 400px; object-fit: cover; border-radius: 8px; margin-bottom: 2rem;"
+		/>
 	)}
 	
 	{homeData ? (
