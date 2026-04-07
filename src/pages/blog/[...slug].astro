@@ -197,11 +197,10 @@ const processedContent = post.body ? processMarkdownContent(post.body) : '';
 <style>
 	.post-header {
 		display: flex;
-		flex-direction: column;
+		flex-direction: row;
 		align-items: center;
 		gap: 1.5rem;
 		margin-bottom: 2rem;
-		text-align: center;
 	}
 	
 	:global(.header-image) {
@@ -209,19 +208,36 @@ const processedContent = post.body ? processMarkdownContent(post.body) : '';
 		height: 300px;
 		object-fit: cover;
 		border-radius: 8px;
+		flex-shrink: 0;
+	}
+	
+	.header-content {
+		flex: 1;
+		min-width: 0;
+		text-align: left;
 	}
 	
 	.header-content h1 {
 		margin-top: 0;
 	}
 	
-	/* Mobile: same centered layout */
+	/* Mobile: stack vertically with centered content */
 	@media (max-width: 768px) {
+		.post-header {
+			flex-direction: column;
+			align-items: center;
+		}
+		
 		:global(.header-image) {
 			width: 100%;
 			max-width: 300px;
 			height: auto;
 			aspect-ratio: 1;
+		}
+		
+		.header-content {
+			width: 100%;
+			text-align: center;
 		}
 	}
 </style>
