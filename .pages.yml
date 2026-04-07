@@ -5,7 +5,7 @@
       "label": "Home Page",
       "type": "file",
       "path": "src/content/home",
-      "format": "yaml-frontmatter",
+      "format": "json",
       "fields": [
         {
           "name": "title",
