@@ -101,7 +101,7 @@ try {
 			// Check if this is a public folder webp image
 			if (imageName.endsWith('.webp')) {
 				heroImageIsPublic = true;
-				publicImagePath = heroImagePath;
+				publicImagePath = '/marketing-blog' + heroImagePath;
 				heroImageSrc = null;
 			} else {
 				// Legacy imported image
