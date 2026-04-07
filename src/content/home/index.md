@@ -1,6 +1,6 @@
 ---
 title: Welcome to My Marketing Blog
-heroImage: /images/angelc3po.jpg
+heroImage: /images/Gemini_Generated_Image_db7x4sdb7x4sdb7x.webp
 ---
 ## Today's the day
 
