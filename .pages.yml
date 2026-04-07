@@ -4,8 +4,8 @@
       "name": "home",
       "label": "Home Page",
       "type": "file",
-      "path": "src/content/home",
-      "format": "json",
+      "path": "src/content/home/index.md",
+      "format": "yaml-frontmatter",
       "fields": [
         {
           "name": "title",
