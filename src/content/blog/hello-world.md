@@ -5,10 +5,6 @@ description: Welcome to my new marketing blog! This is the first post to test
   the content collection schema.
 postImage: /images/Gemini_Generated_Image_e32orwe32orwe32o.webp
 ---
-# Hello World!
-
-Welcome to my new marketing blog! This is the first post to test the content collection schema and make sure everything is working correctly.
-
 ## What to Expect
 
 This blog will cover topics related to:
