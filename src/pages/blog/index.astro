@@ -1,7 +1,17 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getCollection } from 'astro:content';
-import type { CollectionEntry } from 'astro:content';
+import { getCollection, type CollectionEntry } from 'astro:content';
+
+// Get blog index content from CMS
+const blogIndexContent = await getCollection('blogIndex');
+const blogIndexData = blogIndexContent[0]; // Get the first (and only) blog index content
+
+// Get blog posts
+const blogPosts = await getCollection('blog');
+// Sort posts by publication date (newest first)
+const sortedPosts = blogPosts.sort((a: CollectionEntry<'blog'>, b: CollectionEntry<'blog'>) => 
+	new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime()
+);
 
 // Format date as "April 6, 2026"
 function formatDate(date: Date): string {
@@ -12,18 +22,21 @@ function formatDate(date: Date): string {
 	});
 }
 
-const blogPosts = await getCollection('blog');
-// Sort posts by publication date (newest first)
-const sortedPosts = blogPosts.sort((a: CollectionEntry<'blog'>, b: CollectionEntry<'blog'>) => 
-	new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime()
-);
+// Fallback content if CMS content is not available
+const title = blogIndexData?.data?.title || "Blog - Marketing Blog";
+const description = blogIndexData?.data?.body || "Read the latest articles on digital marketing, content creation, SEO, and more.";
+const rendered = blogIndexData?.rendered;
 ---
 
 <BaseLayout 
-	title="Blog - Marketing Blog"
-	description="Read the latest articles on digital marketing, content creation, SEO, and more."
+	title={title}
+	description={description}
 >
-	<h1>Blog Posts</h1>
+	{rendered ? (
+		<div set:html={rendered.html} />
+	) : (
+		<h1>Blog Posts</h1>
+	)}
 	
 	{sortedPosts.length > 0 ? (
 		<section>

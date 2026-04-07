@@ -1,46 +1,9 @@
 {
   "content": [
     {
-      "name": "blog",
-      "label": "Blog Posts",
-      "type": "collection",
-      "path": "src/content/blog",
-      "format": "yaml-frontmatter",
-      "fields": [
-        {
-          "name": "title",
-          "label": "Title",
-          "type": "string",
-          "required": true
-        },
-        {
-          "name": "pubDate",
-          "label": "Date",
-          "type": "date",
-          "required": true
-        },
-        {
-          "name": "description",
-          "label": "Description",
-          "type": "text",
-          "required": true
-        },
-        {
-          "name": "heroImage",
-          "label": "Hero Image",
-          "type": "image"
-        },
-        {
-          "name": "body",
-          "label": "Content",
-          "type": "rich-text"
-        }
-      ]
-    },
-    {
       "name": "home",
       "label": "Home Page",
-      "type": "document",
+      "type": "file",
       "path": "src/content/home",
       "format": "yaml-frontmatter",
       "fields": [
@@ -65,7 +28,7 @@
     {
       "name": "about",
       "label": "About Page",
-      "type": "document",
+      "type": "file",
       "path": "src/content/about",
       "format": "yaml-frontmatter",
       "fields": [
@@ -73,6 +36,63 @@
           "name": "title",
           "label": "Title",
           "type": "string",
+          "required": true
+        },
+        {
+          "name": "heroImage",
+          "label": "Hero Image",
+          "type": "image"
+        },
+        {
+          "name": "body",
+          "label": "Content",
+          "type": "rich-text"
+        }
+      ]
+    },
+    {
+      "name": "blogIndex",
+      "label": "Blog Index",
+      "type": "file",
+      "path": "src/content/home",
+      "format": "yaml-frontmatter",
+      "fields": [
+        {
+          "name": "title",
+          "label": "Title",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "body",
+          "label": "Content",
+          "type": "rich-text"
+        }
+      ]
+    },
+    {
+      "name": "blog",
+      "label": "Blog Posts",
+      "type": "collection",
+      "path": "src/content/blog",
+      "format": "yaml-frontmatter",
+      "fields": [
+        {
+          "name": "title",
+          "label": "Title",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "pubDate",
+          "label": "Date",
+          "type": "date",
+          "required": true
+        },
+        {
+          "name": "description",
+          "label": "Description",
+          "type": "text",
           "required": true
         },
         {
