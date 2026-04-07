@@ -41,19 +41,63 @@ function getImageSrc(imagePath: string) {
 	}
 }
 
-// Process markdown content to handle images with Astro Image component
-function processMarkdownImages(content: string): string {
-	return content.replace(
-		/!\[(.*?)\]\((.*?)\)/g,
-		(match, alt, src) => {
-			if (src.startsWith('/images/')) {
-				// For images in /images/ directory, we'll handle them differently
-				// This is a simplified approach - in production you'd want more robust handling
-				return `<img src="${src}" alt="${alt}" loading="lazy" style="max-width: 100%; height: auto; border-radius: 8px; margin: 1rem 0;">`;
+// Process markdown content - convert markdown to HTML and handle images
+function processMarkdownContent(markdown: string): string {
+	let html = markdown;
+	
+	// Headers
+	html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+	html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+	html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+	
+	// Lists
+	html = html.replace(/^(\s*)- (.+)$/gm, '<li>$2</li>');
+	html = html.replace(/^(\s*)\* (.+)$/gm, '<li>$2</li>');
+	
+	// Bold and italic
+	html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+	html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+	
+	// Images - add base path for GitHub Pages
+	html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="/marketing-blog$2" alt="$1" style="max-width: 100%; border-radius: 8px;" />');
+	
+	// Links
+	html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+	
+	// Paragraphs - wrap lines that aren't already wrapped in tags
+	const lines = html.split('\n');
+	let result = '';
+	let inList = false;
+	
+	for (const line of lines) {
+		const trimmed = line.trim();
+		
+		if (trimmed.startsWith('<li>')) {
+			if (!inList) {
+				result += '<ul>';
+				inList = true;
 			}
-			return match;
+			result += trimmed;
+		} else if (inList && !trimmed.startsWith('<li>')) {
+			result += '</ul>';
+			inList = false;
+			if (trimmed && !trimmed.startsWith('<')) {
+				result += '<p>' + trimmed + '</p>';
+			} else {
+				result += trimmed;
+			}
+		} else if (trimmed && !trimmed.startsWith('<')) {
+			result += '<p>' + trimmed + '</p>';
+		} else {
+			result += trimmed;
 		}
-	);
+	}
+	
+	if (inList) {
+		result += '</ul>';
+	}
+	
+	return result;
 }
 
 interface Props {
@@ -65,12 +109,28 @@ const rendered = post.rendered;
 
 // Process hero image
 let heroImageSrc = null;
+let heroImageIsPublic = false;
+let publicHeroImagePath = null;
+
 if (post.data.heroImage) {
-	heroImageSrc = getImageSrc(post.data.heroImage);
+	const imageName = post.data.heroImage.replace('/images/', '');
+	
+	// Check if this is a public folder webp image
+	if (imageName.endsWith('.webp')) {
+		heroImageIsPublic = true;
+		publicHeroImagePath = '/marketing-blog' + post.data.heroImage;
+		heroImageSrc = null;
+	} else {
+		// Legacy imported image
+		heroImageIsPublic = false;
+		publicHeroImagePath = null;
+		heroImageSrc = getImageSrc(post.data.heroImage);
+	}
 }
 
 // Process content to handle images
-const processedContent = rendered ? processMarkdownImages(rendered.html) : '';
+const processedContent = rendered ? processMarkdownContent(rendered.markdown) : '';
+
 ---
 
 <BaseLayout 
@@ -95,7 +155,7 @@ const processedContent = rendered ? processMarkdownImages(rendered.html) : '';
 			)}
 		</header>
 		
-		{heroImageSrc && (
+		{heroImageSrc && !heroImageIsPublic && (
 			<Image 
 				src={heroImageSrc} 
 				alt={post.data.title} 
@@ -103,6 +163,15 @@ const processedContent = rendered ? processMarkdownImages(rendered.html) : '';
 				height={600}
 				format="webp"
 				quality={80}
+				loading="eager"
+				style="width: 100%; max-height: 600px; object-fit: cover; border-radius: 8px; margin: 2rem 0;"
+			/>
+		)}
+		
+		{heroImageIsPublic && publicHeroImagePath && (
+			<img 
+				src={publicHeroImagePath} 
+				alt={post.data.title} 
 				loading="eager"
 				style="width: 100%; max-height: 600px; object-fit: cover; border-radius: 8px; margin: 2rem 0;"
 			/>
