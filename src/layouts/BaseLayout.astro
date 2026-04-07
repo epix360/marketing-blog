@@ -36,8 +36,8 @@ const currentYear = new Date().getFullYear();
 			tags={tags}
 			publishedDate={publishedDate}
 		/>
-		<link rel="icon" type="image/svg+xml" href="/marketing-blog/favicon.svg" />
-		<link rel="icon" href="/marketing-blog/favicon.ico" />
+		<link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL}favicon.svg`} />
+		<link rel="icon" href={`${import.meta.env.BASE_URL}favicon.ico`} />
 		<meta name="generator" content={Astro.generator} />
 	</head>
 	<body>
@@ -47,10 +47,10 @@ const currentYear = new Date().getFullYear();
 					<li><strong>Marketing Blog</strong></li>
 				</ul>
 				<ul>
-					<li><a href="/marketing-blog/">Home</a></li>
-					<li><a href="/marketing-blog/blog">Blog</a></li>
-					<li><a href="/marketing-blog/about">About</a></li>
-					<li><a href="/marketing-blog/contact">Contact</a></li>
+					<li><a href={import.meta.env.BASE_URL}>Home</a></li>
+					<li><a href={`${import.meta.env.BASE_URL}blog`}>Blog</a></li>
+					<li><a href={`${import.meta.env.BASE_URL}about`}>About</a></li>
+					<li><a href={`${import.meta.env.BASE_URL}contact`}>Contact</a></li>
 				</ul>
 			</nav>
 			<Search />
