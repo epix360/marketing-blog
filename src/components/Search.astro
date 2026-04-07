@@ -19,8 +19,7 @@
 	// Load Pagefind after the page loads
 	async function loadPagefind() {
 		// Only try to load Pagefind in production or after build
-		const isProd = JSON.parse('{{import.meta.env.PROD}}'); 
-	if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+		if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
 			try {
 				// Use dynamic import with Vite ignore to prevent build-time resolution
 				const pagefindModule = await import(/* @vite-ignore */ '/pagefind/pagefind.js');
