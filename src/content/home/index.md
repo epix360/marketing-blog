@@ -5,5 +5,5 @@ lastUpdated: 2026-04-07T09:20:00-06:00
 ---
 ## Today's the day
 
-Today is the day you finally get your marketing plan straightened out and under control
+Today is the day you finally get your marketing plan straightened out and under control. You're welcome.
 
