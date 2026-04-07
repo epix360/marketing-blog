@@ -42,7 +42,12 @@ function getImageSrc(imagePath: string) {
 }
 
 // Process markdown content - convert markdown to HTML and handle images
-function processMarkdownContent(markdown: string): string {
+function processMarkdownContent(markdown: string | undefined): string {
+	// Guard clause for undefined/null content
+	if (!markdown || typeof markdown !== 'string') {
+		return '';
+	}
+	
 	let html = markdown;
 	
 	// Headers
