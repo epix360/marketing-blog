@@ -6,6 +6,8 @@ description: Welcome to my new marketing blog! This is the first post to test
 postImage: /images/Gemini_Generated_Image_e32orwe32orwe32o.webp
 tags:
   - intro
+  - introduction
+  - first post
 ---
 ## What to Expect
 
