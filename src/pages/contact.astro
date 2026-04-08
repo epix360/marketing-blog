@@ -68,9 +68,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 		emailjs.init(publicKey);
 	}
 	
-	const form = document.getElementById('contact-form');
-	const submitBtn = document.getElementById('submit-btn');
-	const messageDiv = document.getElementById('form-message');
+	const form = document.getElementById('contact-form') as HTMLFormElement | null;
+	const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement | null;
+	const messageDiv = document.getElementById('form-message') as HTMLDivElement | null;
 	
 	form?.addEventListener('submit', async (e) => {
 		e.preventDefault();
@@ -81,6 +81,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 		}
 		
 		// Show loading state
+		if (!submitBtn) return;
 		submitBtn.disabled = true;
 		submitBtn.textContent = 'Sending...';
 		
@@ -101,12 +102,14 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 			console.error('EmailJS error:', error);
 			showMessage('Something went wrong, please try again later.', 'error');
 		} finally {
-			submitBtn.disabled = false;
-			submitBtn.textContent = 'Send Message';
+			if (submitBtn) {
+				submitBtn.disabled = false;
+				submitBtn.textContent = 'Send Message';
+			}
 		}
 	});
 	
-	function showMessage(text, type) {
+	function showMessage(text: string, type: string) {
 		if (messageDiv) {
 			messageDiv.textContent = text;
 			messageDiv.className = type;
