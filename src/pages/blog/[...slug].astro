@@ -184,7 +184,7 @@ const processedContent = post.body ? processMarkdownContent(post.body) : '';
 			</div>
 		</header>
 		
-		<div class="post-content" set:html={processedContent} />
+		<div class="post-content" data-pagefind-body set:html={processedContent} />
 		
 		<footer>
 			<p>

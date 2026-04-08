@@ -65,8 +65,8 @@
 												${result.data?.meta?.title || result.url}
 											</a>
 										</h4>
-										<p style="margin: 0; font-size: 0.875rem; color: #666;">
-											${result.data?.excerpt || result.data?.plain_excerpt || result.url}
+										<p style="margin: 0; font-size: 0.875rem; color: #999; font-style: italic; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4;">
+											${result.data?.excerpt || result.data?.plain_excerpt || result.data?.meta?.description || result.url}
 										</p>
 									</div>
 								`).join('');
@@ -130,8 +130,8 @@
 												${result.data?.meta?.title || result.url}
 											</a>
 										</h4>
-										<p style="margin: 0; font-size: 0.875rem; color: #666;">
-											${result.data?.excerpt || result.data?.plain_excerpt || result.url}
+										<p style="margin: 0; font-size: 0.875rem; color: #999; font-style: italic; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4;">
+											${result.data?.excerpt || result.data?.plain_excerpt || result.data?.meta?.description || result.url}
 										</p>
 									</div>
 								`).join('');
