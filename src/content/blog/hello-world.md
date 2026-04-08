@@ -4,7 +4,8 @@ pubDate: 2026-04-06
 description: Welcome to my new marketing blog! This is the first post to test
   the content collection schema.
 postImage: /images/Gemini_Generated_Image_e32orwe32orwe32o.webp
-tags: marketing strategies, seo, introduction
+tags:
+  - intro
 ---
 ## What to Expect
 
