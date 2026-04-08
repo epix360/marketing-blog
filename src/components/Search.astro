@@ -163,8 +163,15 @@
 <style>
 	#search-container {
 		position: relative;
-		width: 400px;
+		width: 100%;
+		max-width: 400px;
 		flex-shrink: 0;
+	}
+	
+	@media (max-width: 767px) {
+		#search-container {
+			max-width: 100%;
+		}
 	}
 	
 	.visually-hidden {

@@ -42,17 +42,17 @@ const currentYear = new Date().getFullYear();
 	</head>
 	<body>
 		<header>
-			<nav style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+			<nav class="main-nav">
 				<ul>
 					<li><strong>Marketing Blog</strong></li>
 				</ul>
-				<Search />
-				<ul style="display: flex; gap: 1rem; margin: 0; padding: 0; list-style: none;">
+				<ul class="nav-links">
 					<li><a href={import.meta.env.BASE_URL}>Home</a></li>
 					<li><a href={`${import.meta.env.BASE_URL}blog`}>Blog</a></li>
 					<li><a href={`${import.meta.env.BASE_URL}about`}>About</a></li>
 					<li><a href={`${import.meta.env.BASE_URL}contact`}>Contact</a></li>
 				</ul>
+				<Search />
 			</nav>
 		</header>
 		
@@ -70,3 +70,67 @@ const currentYear = new Date().getFullYear();
 		<Analytics />
 	</body>
 </html>
+
+<style>
+	/* Ensure html and body don't constrain width */
+	html, body {
+		max-width: 100%;
+		overflow-x: hidden;
+	}
+	
+	/* Mobile-first: Default styles for mobile */
+	.main-nav {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.5rem;
+		width: 100%;
+	}
+	
+	.nav-links {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 1rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+	
+	/* Mobile: Override Pico's container to be truly full-width */
+	@media (max-width: 767px) {
+		main.container,
+		body > header,
+		body > footer {
+			max-width: 100% !important;
+			width: 100% !important;
+			padding-left: 1rem !important;
+			padding-right: 1rem !important;
+			margin-left: 0 !important;
+			margin-right: 0 !important;
+		}
+	}
+	
+	/* Desktop: Horizontal layout with nav links left, search right */
+	@media (min-width: 768px) {
+		.main-nav {
+			flex-direction: row;
+			justify-content: flex-start;
+			align-items: center;
+			gap: 1rem;
+		}
+		
+		.main-nav > ul:first-child {
+			margin-right: auto;
+		}
+		
+		.nav-links {
+			flex-wrap: nowrap;
+		}
+		
+		.main-nav > #search-container,
+		.main-nav > [id="search-container"] {
+			margin-left: auto;
+		}
+	}
+</style>
