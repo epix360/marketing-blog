@@ -1,0 +1,31 @@
+# Pagefind Configuration
+# Documentation: https://pagefind.app/docs/config-options/
+
+# Root folder to index (matches --site dist in package.json)
+site: dist
+
+# File pattern to match for indexing
+glob: "**/*.html"
+
+# CSS selectors to exclude from search index
+# Excludes navigation, footer, and other non-content elements
+exclude_selectors:
+  - nav
+  - footer
+  - header
+
+# Keep the index URL in search results
+keep_index_url: true
+
+# Language settings (uncomment to force specific language)
+force_language: en
+
+# Optional: Sort order for results
+# sort:
+#   date: desc
+
+# Optional: Treat & as 'and' in search queries
+# merge_ampersand: true
+
+# Optional: Verbose logging for debugging
+# verbose: false
