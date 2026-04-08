@@ -29,7 +29,7 @@ const {
 
 // Generate structured data for Schema.org
 function generateStructuredData() {
-	const baseData = {
+	const baseData: Record<string, any> = {
 		'@context': 'https://schema.org',
 		'@type': type === 'article' ? 'BlogPosting' : 'WebSite',
 		name: title,
@@ -63,7 +63,7 @@ function generateStructuredData() {
 <!-- Basic Meta Tags -->
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta name="description" content={description} />
+<meta name="description" content={description} data-pagefind-meta="description[content]" />
 <meta name="author" content={author} />
 
 <!-- Open Graph Tags -->
