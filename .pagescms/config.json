@@ -101,6 +101,16 @@
           "type": "image"
         },
         {
+          "name": "tags",
+          "label": "Tags",
+          "type": "array",
+          "field": {
+            "name": "tag",
+            "label": "Tag",
+            "type": "string"
+          }
+        },
+        {
           "name": "body",
           "label": "Content",
           "type": "rich-text"
