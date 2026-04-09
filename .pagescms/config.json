@@ -103,12 +103,8 @@
         {
           "name": "tags",
           "label": "Tags",
-          "type": "array",
-          "field": {
-            "name": "tag",
-            "label": "Tag",
-            "type": "string"
-          }
+          "type": "string",
+          "list": true
         },
         {
           "name": "body",
