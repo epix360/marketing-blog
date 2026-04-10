@@ -41,47 +41,43 @@ const currentYear = new Date().getFullYear();
 		<meta name="generator" content={Astro.generator} />
 	</head>
 	<body>
-		<header>
-			<nav class="main-nav">
-				<ul>
-					<li><strong>Marketing Blog</strong></li>
-				</ul>
-				<ul class="nav-links">
-					<li><a href={import.meta.env.BASE_URL}>Home</a></li>
-					<li><a href={`${import.meta.env.BASE_URL}blog`}>Blog</a></li>
-					<li><a href={`${import.meta.env.BASE_URL}about`}>About</a></li>
-					<li><a href={`${import.meta.env.BASE_URL}contact`}>Contact</a></li>
-				</ul>
-				<Search />
-			</nav>
-		</header>
-		
-		<main class="container">
-			<slot />
-		</main>
-		
-		<footer>
-			<nav>
-				<ul>
-					<li>© {currentYear} Marketing Blog. All rights reserved.</li>
-				</ul>
-			</nav>
-		</footer>
-		<Analytics />
-	</body>
-</html>
-
-<style>
+		<style>
 	/* Max width for content */
 	html, body {
-    max-width: 1400px;
-    margin: 0 auto;
+		max-width: 1400px;
+		margin: 0 auto;
 	}
 
-	ul {
-		list-style-position: inside;
-	}
-	
+		/* Sticky header base styles */
+		.sticky-header {
+			position: -webkit-sticky;
+			position: sticky;
+			top: 0;
+			z-index: 100;
+			background: #13141f;
+			border-bottom: 1px solid rgba(194, 199, 208, 0.1);
+			box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+			transition: padding 0.3s ease, box-shadow 0.3s ease;
+			padding: 0;
+			box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+		}
+		
+		.sticky-header .main-nav {
+			transition: transform 0.3s ease;
+		}
+
+		.sticky-header .main-nav ul {
+			gap: 0;
+		}
+
+		.sticky-header .main-nav ul li:not(:first-child) {
+			border-left: 1px solid rgba(194, 199, 208, 0.1);
+		}
+		
+		ul {
+			list-style-position: inside;
+		}
+
 	/* Mobile-first: Default styles for mobile */
 	.main-nav {
 		display: flex;
@@ -103,6 +99,10 @@ const currentYear = new Date().getFullYear();
 	
 	/* Mobile: Override Pico's container to be truly full-width */
 	@media (max-width: 767px) {
+		html, body {
+			max-width: 100% !important;
+		}
+		
 		main.container,
 		body > header,
 		body > footer {
@@ -113,10 +113,152 @@ const currentYear = new Date().getFullYear();
 			margin-left: 0 !important;
 			margin-right: 0 !important;
 		}
+		
+		/* Ensure sticky header works on mobile */
+		.sticky-header {
+			position: sticky;
+			top: 0;
+			left: 0;
+			right: 0;
+			width: 100%;
+		}
 	}
 	
-	/* Desktop: Horizontal layout with nav links left, search right */
+	/* Hamburger button */
+	.hamburger {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+		background: none;
+		border: none;
+		padding: 0.5rem;
+		cursor: pointer;
+		z-index: 1001;
+	}
+	
+	.hamburger span {
+		display: block;
+		width: 24px;
+		height: 2px;
+		background: currentColor;
+		transition: transform 0.3s, opacity 0.3s;
+	}
+	
+	/* Mobile drawer and overlay */
+	@media (max-width: 767px) {
+		.main-nav {
+			flex-direction: row;
+			flex-wrap: nowrap;
+			align-items: center;
+			justify-content: flex-start;
+		}
+		
+		.main-nav > ul:first-child {
+			margin-right: auto;
+		}
+		
+		/* Hide nav-links in drawer by default */
+		.nav-drawer {
+			position: fixed;
+			top: 0;
+			right: -100%;
+			width: 70%;
+			max-width: 300px;
+			height: 100vh;
+			background: #1a1a2e;
+			box-shadow: -2px 0 12px rgba(0,0,0,0.3);
+			transition: right 0.3s ease;
+			z-index: 1000;
+			padding: 4rem 1.5rem 2rem;
+		}
+		
+		/* Nav links in drawer - light text on dark background */
+		.nav-drawer .nav-links a {
+			color: #c2c7d0;
+		}
+		
+		.nav-drawer.open {
+			right: 0;
+		}
+		
+		.nav-drawer .nav-links {
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 1.5rem;
+		}
+		
+		.nav-drawer .nav-links li {
+			width: 100%;
+		}
+		
+		.nav-drawer .nav-links a {
+			display: block;
+			padding: 0.5rem 0;
+			font-size: 1.1rem;
+		}
+		
+		/* Overlay */
+		.nav-overlay {
+			display: none;
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: rgba(0,0,0,0.5);
+			z-index: 999;
+		}
+		
+		.nav-overlay.open {
+			display: block;
+		}
+		
+		/* Hamburger animation when open */
+		.hamburger[aria-expanded="true"] span:nth-child(1) {
+			transform: translateY(6px) rotate(45deg);
+		}
+		
+		.hamburger[aria-expanded="true"] span:nth-child(2) {
+			opacity: 0;
+		}
+		
+		.hamburger[aria-expanded="true"] span:nth-child(3) {
+			transform: translateY(-6px) rotate(-45deg);
+		}
+		
+		/* Darker overlay for better contrast */
+		.nav-overlay {
+			background: rgba(0,0,0,0.7);
+		}
+	}
+	
+	/* Desktop: hide hamburger, show nav normally */
 	@media (min-width: 768px) {
+		.hamburger {
+			display: none;
+		}
+		
+		.nav-drawer {
+			position: static;
+			width: auto;
+			height: auto;
+			background: transparent;
+			box-shadow: none;
+			padding: 0;
+			transition: none;
+		}
+		
+		.nav-drawer .nav-links {
+			flex-direction: row;
+			flex-wrap: nowrap;
+			justify-content: center;
+			gap: 1rem;
+		}
+		
+		.nav-overlay {
+			display: none !important;
+		}
+		
 		.main-nav {
 			flex-direction: row;
 			justify-content: flex-start;
@@ -128,13 +270,132 @@ const currentYear = new Date().getFullYear();
 			margin-right: auto;
 		}
 		
-		.nav-links {
-			flex-wrap: nowrap;
-		}
-		
 		.main-nav > #search-container,
 		.main-nav > [id="search-container"] {
 			margin-left: auto;
 		}
+
+		.nav-links li {
+			min-width: 5rem;
+			text-align: center;
+			border-bottom: 5px solid transparent;
+		}
+
+		.nav-links li:hover {
+			border-bottom: 5px solid #667eea;
+		}
+
+		.nav-links li a {
+			color: #e0e3e7;
+		}
+
+		.nav-links li a:hover {
+			text-decoration: none;
+		}
+
+		/* Disable scale effect on mobile to prevent jitter */
+		.sticky-header.scrolled .main-nav {
+			transform: scale(0.95);
+		}
 	}
 </style>
+
+		<header class="sticky-header">
+			<nav class="main-nav">
+				<ul>
+					<li><strong>Marketing Blog</strong></li>
+				</ul>
+				
+				<Search />
+				
+				<!-- Hamburger button (mobile only) -->
+				<button class="hamburger" aria-label="Toggle menu" aria-expanded="false">
+					<span></span>
+					<span></span>
+					<span></span>
+				</button>
+				
+				<!-- Drawer for mobile nav -->
+				<div class="nav-drawer">
+					<ul class="nav-links">
+						<li><a href={import.meta.env.BASE_URL}>Home</a></li>
+						<li><a href={`${import.meta.env.BASE_URL}blog`}>Blog</a></li>
+						<li><a href={`${import.meta.env.BASE_URL}about`}>About</a></li>
+						<li><a href={`${import.meta.env.BASE_URL}contact`}>Contact</a></li>
+					</ul>
+				</div>
+				
+				<!-- Overlay for mobile drawer -->
+				<div class="nav-overlay"></div>
+			</nav>
+		</header>
+		
+		<main class="container">
+			<slot />
+		</main>
+		
+		<footer>
+			<nav>
+				<ul>
+					<li>© {currentYear} Marketing Blog. All rights reserved.</li>
+				</ul>
+			</nav>
+		</footer>
+		<Analytics />
+		
+		<script>
+			// Hamburger menu toggle
+			const hamburger = document.querySelector('.hamburger');
+			const drawer = document.querySelector('.nav-drawer');
+			const overlay = document.querySelector('.nav-overlay');
+			
+			function toggleMenu() {
+				const isOpen = drawer?.classList.contains('open');
+				drawer?.classList.toggle('open', !isOpen);
+				overlay?.classList.toggle('open', !isOpen);
+				hamburger?.setAttribute('aria-expanded', String(!isOpen));
+			}
+			
+			function closeMenu() {
+				drawer?.classList.remove('open');
+				overlay?.classList.remove('open');
+				hamburger?.setAttribute('aria-expanded', 'false');
+			}
+			
+			hamburger?.addEventListener('click', toggleMenu);
+			overlay?.addEventListener('click', closeMenu);
+			
+			// Close drawer on window resize to desktop
+			window.addEventListener('resize', () => {
+				if (window.innerWidth >= 768) {
+					closeMenu();
+				}
+			});
+			
+			// Sticky header scroll effect with throttling for mobile performance
+			const header = document.querySelector('.sticky-header');
+			let lastScroll = 0;
+			let ticking = false;
+			
+			function updateHeader() {
+				const currentScroll = window.pageYOffset;
+				
+				if (currentScroll > 50) {
+					header?.classList.add('scrolled');
+				} else {
+					header?.classList.remove('scrolled');
+				}
+				
+				lastScroll = currentScroll;
+				ticking = false;
+			}
+			
+			window.addEventListener('scroll', () => {
+				if (!ticking) {
+					requestAnimationFrame(updateHeader);
+					ticking = true;
+				}
+			}, { passive: true });
+		</script>
+	</body>
+</html>
