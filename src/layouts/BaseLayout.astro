@@ -23,6 +23,8 @@ const {
 	publishedDate 
 } = Astro.props;
 const currentYear = new Date().getFullYear();
+const base = import.meta.env.BASE_URL;
+const path = Astro.url.pathname;
 ---
 
 <!doctype html>
@@ -276,13 +278,29 @@ const currentYear = new Date().getFullYear();
 		}
 
 		.nav-links li {
+			position: relative;
 			min-width: 5rem;
 			text-align: center;
-			border-bottom: 5px solid transparent;
 		}
 
-		.nav-links li:hover {
+		.nav-links li:first-child:hover,
+		.nav-links li:first-child.active {
 			border-bottom: 5px solid #667eea;
+		}
+
+		.nav-links li:nth-child(2):hover,
+		.nav-links li:nth-child(2).active {
+			border-bottom: 5px solid #86f4c9;
+		}
+
+		.nav-links li:nth-child(3):hover,
+		.nav-links li:nth-child(3).active {
+			border-bottom: 5px solid #ECD47B;
+		}
+
+		.nav-links li:nth-child(4):hover,
+		.nav-links li:nth-child(4).active {
+			border-bottom: 5px solid #ff6663;
 		}
 
 		.nav-links li a {
@@ -291,6 +309,17 @@ const currentYear = new Date().getFullYear();
 
 		.nav-links li a:hover {
 			text-decoration: none;
+		}
+
+		/* Stretched link */
+		.stretched-link::after {
+			position: absolute;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+			z-index: 1;
+			content: "";
 		}
 
 		/* Disable scale effect on mobile to prevent jitter */
@@ -318,10 +347,18 @@ const currentYear = new Date().getFullYear();
 				<!-- Drawer for mobile nav -->
 				<div class="nav-drawer">
 					<ul class="nav-links">
-						<li><a href={import.meta.env.BASE_URL}>Home</a></li>
-						<li><a href={`${import.meta.env.BASE_URL}blog`}>Blog</a></li>
-						<li><a href={`${import.meta.env.BASE_URL}about`}>About</a></li>
-						<li><a href={`${import.meta.env.BASE_URL}contact`}>Contact</a></li>
+						<li class={path === base || path === `${base}/` ? 'active' : ''}>
+							<a class="stretched-link" href={base}>Home</a>
+						</li>
+						<li class={path.startsWith(`${base}blog`) ? 'active' : ''}>
+							<a class="stretched-link" href={`${base}blog`}>Blog</a>
+						</li>
+						<li class={path === `${base}about` || path === `${base}about/` ? 'active' : ''}>
+							<a class="stretched-link" href={`${base}about`}>About</a>
+						</li>
+						<li class={path === `${base}contact` || path === `${base}contact/` ? 'active' : ''}>
+							<a class="stretched-link" href={`${base}contact`}>Contact</a>
+						</li>
 					</ul>
 				</div>
 				
