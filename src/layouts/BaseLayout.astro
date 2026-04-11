@@ -25,6 +25,11 @@ const {
 const currentYear = new Date().getFullYear();
 const base = import.meta.env.BASE_URL;
 const path = Astro.url.pathname;
+
+// Normalize paths for comparison (remove trailing slashes)
+const normalize = (p: string) => p.replace(/\/$/, '') || '/';
+const normPath = normalize(path);
+const normBase = normalize(base);
 ---
 
 <!doctype html>
@@ -347,16 +352,16 @@ const path = Astro.url.pathname;
 				<!-- Drawer for mobile nav -->
 				<div class="nav-drawer">
 					<ul class="nav-links">
-						<li class={path === base || path === `${base}/` ? 'active' : ''}>
+						<li class={normPath === normBase || normPath === normBase + '/' ? 'active' : ''}>
 							<a class="stretched-link" href={base}>Home</a>
 						</li>
-						<li class={path.startsWith(`${base}blog`) ? 'active' : ''}>
+						<li class={normPath.startsWith(normBase + '/blog') || normPath === normBase + '/blog' ? 'active' : ''}>
 							<a class="stretched-link" href={`${base}blog`}>Blog</a>
 						</li>
-						<li class={path === `${base}about` || path === `${base}about/` ? 'active' : ''}>
+						<li class={normPath === normBase + '/about' ? 'active' : ''}>
 							<a class="stretched-link" href={`${base}about`}>About</a>
 						</li>
-						<li class={path === `${base}contact` || path === `${base}contact/` ? 'active' : ''}>
+						<li class={normPath === normBase + '/contact' ? 'active' : ''}>
 							<a class="stretched-link" href={`${base}contact`}>Contact</a>
 						</li>
 					</ul>
