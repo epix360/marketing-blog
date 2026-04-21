@@ -26,18 +26,31 @@ function formatDate(date: Date): string {
 	});
 }
 
-// Image mapping function
-function getImageSrc(imagePath: string) {
+// Unified image handling function
+function getImageInfo(imagePath: string) {
+	if (!imagePath) {
+		return { src: null, isPublic: false };
+	}
+	
+	// Check if it's a public image (starts with /images/ and has extension)
+	if (imagePath.startsWith('/images/') && /\.(jpg|jpeg|png|webp|gif|svg)$/i.test(imagePath)) {
+		return { 
+			src: '/marketing-blog' + imagePath, 
+			isPublic: true 
+		};
+	}
+	
+	// Handle legacy imported images
 	const imageName = imagePath.replace('/images/', '');
 	switch(imageName) {
 		case 'hero-home.jpg':
-			return heroHomeImage;
+			return { src: heroHomeImage, isPublic: false };
 		case 'hero-about.jpg':
-			return heroAboutImage;
+			return { src: heroAboutImage, isPublic: false };
 		case 'Bat-Georgia.jpg':
-			return batGeorgiaImage;
+			return { src: batGeorgiaImage, isPublic: false };
 		default:
-			return batGeorgiaImage; // fallback
+			return { src: batGeorgiaImage, isPublic: false };
 	}
 }
 
@@ -63,9 +76,7 @@ function processMarkdownContent(markdown: string | undefined): string {
 	html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
 	html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
 	
-	// Images - add base path for GitHub Pages
-	html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="/marketing-blog$2" alt="$1" style="max-width: 100%; border-radius: 8px;" />');
-	
+		
 	// Links
 	html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
 	
@@ -105,6 +116,20 @@ function processMarkdownContent(markdown: string | undefined): string {
 	return result;
 }
 
+// Images - let proper image handling function process them
+function processMarkdownImages(html: string): string {
+	// Process images using the same logic as main image handling
+	return html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt, title) => {
+		const imageInfo = getImageInfo(`/images/${title}`);
+		if (imageInfo.isPublic) {
+			return `<img src="/marketing-blog/images/${title}" alt="${alt}" style="max-width: 100%; border-radius: 8px;" />`;
+		} else {
+			// For imported images, let the main template handle them
+			return match; // Don't modify, keep original ![alt](title) syntax
+		}
+	});
+}
+
 interface Props {
 	post: CollectionEntry<'blog'>;
 }
@@ -113,25 +138,7 @@ const { post }: Props = Astro.props;
 const rendered = post.rendered;
 
 // Process post image
-let postImageSrc = null;
-let postImageIsPublic = false;
-let publicPostImagePath = null;
-
-if (post.data.postImage) {
-	const imageName = post.data.postImage.replace('/images/', '');
-	
-	// Check if this is a public folder webp image
-	if (imageName.endsWith('.webp')) {
-		postImageIsPublic = true;
-		publicPostImagePath = '/marketing-blog' + post.data.postImage;
-		postImageSrc = null;
-	} else {
-		// Legacy imported image
-		postImageIsPublic = false;
-		publicPostImagePath = null;
-		postImageSrc = getImageSrc(post.data.postImage);
-	}
-}
+const imageInfo = getImageInfo(post.data.postImage);
 
 // Process content to handle images
 const processedContent = post.body ? processMarkdownContent(post.body) : '';
@@ -148,9 +155,17 @@ const processedContent = post.body ? processMarkdownContent(post.body) : '';
 >
 	<article>
 		<header class="post-header">
-			{postImageSrc && !postImageIsPublic && (
+			{imageInfo.src && (
+			imageInfo.isPublic ? (
+				<img 
+					src={imageInfo.src} 
+					alt={post.data.title}
+					loading="eager"
+					class="header-image"
+				/>
+			) : (
 				<Image 
-					src={postImageSrc} 
+					src={imageInfo.src} 
 					alt={post.data.title}
 					width={400}
 					height={400}
@@ -159,16 +174,8 @@ const processedContent = post.body ? processMarkdownContent(post.body) : '';
 					loading="eager"
 					class="header-image"
 				/>
-			)}
-			
-			{postImageIsPublic && publicPostImagePath && (
-				<img 
-					src={publicPostImagePath} 
-					alt={post.data.title}
-					loading="eager"
-					class="header-image"
-				/>
-			)}
+			)
+		)}
 			
 			<div class="header-content">
 				<h1>{post.data.title}</h1>
