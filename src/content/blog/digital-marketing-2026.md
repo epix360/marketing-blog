@@ -3,7 +3,7 @@ title: Digital Marketing Strategies for 2026
 pubDate: 2026-04-05
 description: Explore the latest digital marketing trends and strategies that
   will dominate in 2026.
-postImage: /images/Porter_Digital_Marketing_Logo_White.png
+postImage: /images/Gemini_Generated_Image_x5uh3jx5uh3jx5uh.webp
 ---
 # Digital Marketing Strategies for 2026
 
