@@ -4,38 +4,9 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 import fs from 'fs/promises';
 import { join } from 'path';
 import { Image } from 'astro:assets';
-
-// Import available images
-import heroHomeImage from '../../assets/images/hero-home.jpg';
-import heroAboutImage from '../../assets/images/hero-about.jpg';
-import batGeorgiaImage from '../../assets/images/Bat-Georgia.jpg';
-import angelc3poImage from '../../assets/images/angelc3po.jpg';
-
-// Image mapping function
-function getImageSrc(imagePath: string) {
-	const imageName = imagePath.replace('/images/', '');
-	switch(imageName) {
-		case 'hero-home.jpg':
-			return heroHomeImage;
-		case 'hero-about.jpg':
-			return heroAboutImage;
-		case 'Bat-Georgia.jpg':
-			return batGeorgiaImage;
-		case 'angelc3po.jpg':
-			return angelc3poImage;
-		default:
-			return heroHomeImage; // fallback
-	}
-}
-
-// Format date as "April 6, 2026"
-function formatDate(date: Date): string {
-	return date.toLocaleDateString('en-US', {
-		year: 'numeric',
-		month: 'long',
-		day: 'numeric'
-	});
-}
+import { getImageInfo } from '../../lib/imageUtils';
+import { formatDate } from '../../lib/formatDate';
+import { markdownToHtml } from '../../lib/markdown';
 
 // Get blog posts
 const blogPosts = await getCollection('blog');
@@ -55,42 +26,6 @@ try {
 	blogIndexContent = parseFrontmatter(fileContent);
 } catch (error) {
 	console.warn('Could not load blog index content:', error);
-}
-
-// Simple markdown to HTML converter
-function markdownToHtml(markdown: string): string {
-	let html = markdown;
-	
-	// Headers
-	html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
-	html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
-	html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
-	
-	// Lists
-	html = html.replace(/^- (.+)$/gm, '<li>$1</li>');
-	html = html.replace(/^\* (.+)$/gm, '<li>$1</li>');
-	
-	// Bold and italic
-	html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-	html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
-	
-	// Paragraphs
-	html = html.replace(/\n\n/g, '</p><p>');
-	html = html.replace(/\n/g, '<br>');
-	
-	// Wrap in paragraphs
-	const lines = html.split('<br>');
-	let result = '';
-	for (let i = 0; i < lines.length; i++) {
-		const line = lines[i].trim();
-		if (line && !line.startsWith('<') && !line.startsWith('</')) {
-			result += '<p>' + line + '</p>';
-		} else {
-			result += line;
-		}
-	}
-	
-	return result;
 }
 
 // Parse frontmatter from content
@@ -115,6 +50,10 @@ function parseFrontmatter(content: string): { title?: string; body?: string } {
 // Define variables for template
 const title = blogIndexContent?.title || blogIndexTitle;
 const renderedContent = blogIndexContent?.body ? markdownToHtml(blogIndexContent.body) : '';
+const postsWithImages = sortedPosts.map((post: CollectionEntry<'blog'>) => ({
+	post,
+	imageInfo: getImageInfo(post.data.postImage),
+}));
 
 ---
 
@@ -128,39 +67,40 @@ const renderedContent = blogIndexContent?.body ? markdownToHtml(blogIndexContent
 		<h1>Blog Posts</h1>
 	)}
 	
-	{sortedPosts.length > 0 ? (
+	{postsWithImages.length > 0 ? (
 		<section class="blog-grid">
-			{sortedPosts.map((post: CollectionEntry<'blog'>) => (
-				<a href={`/marketing-blog/blog/${post.id}`} class="blog-card-link">
+			{postsWithImages.map(({ post, imageInfo }) => (
+				<a href={`${import.meta.env.BASE_URL}blog/${post.id}`} class="blog-card-link">
 					<article class="blog-card">
 						<div class="card-image">
-							{post.data.postImage && !post.data.postImage.startsWith('/images/') && (
-								<Image 
-									src={getImageSrc(post.data.postImage)} 
-									alt={post.data.title}
-									width={200}
-									height={200}
-									format="webp"
-									quality={80}
-									class="thumbnail"
-								/>
-							)}
-							{post.data.postImage?.startsWith('/images/') && (
-								<img 
-									src={`${import.meta.env.BASE_URL}${post.data.postImage.replace(/^\//, '')}`} 
-									alt={post.data.title}
-									loading="lazy"
-									class="thumbnail"
-								/>
+							{imageInfo.src && (
+								imageInfo.isPublic ? (
+									<img
+										src={imageInfo.src}
+										alt={post.data.title}
+										loading="lazy"
+										class="thumbnail"
+									/>
+								) : (
+									<Image
+										src={imageInfo.src}
+										alt={post.data.title}
+										width={200}
+										height={200}
+										format="webp"
+										quality={80}
+										class="thumbnail"
+									/>
+								)
 							)}
 						</div>
 						<div class="card-content">
 							<h2>{post.data.title}</h2>
 							<p class="description">
-							{post.data.description.length > 120 
-								? post.data.description.slice(0, 120) + '...' 
-								: post.data.description}
-						</p>
+								{post.data.description.length > 120
+									? post.data.description.slice(0, 120) + '...'
+									: post.data.description}
+							</p>
 							<time datetime={post.data.pubDate.toISOString()}>
 								{formatDate(post.data.pubDate)}
 							</time>

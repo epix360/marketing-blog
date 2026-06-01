@@ -1,13 +1,10 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getCollection } from 'astro:content';
+import { getCollection, render } from 'astro:content';
 import type { CollectionEntry } from 'astro:content';
 import { Image } from 'astro:assets';
-
-// Import available images
-import heroHomeImage from '../../assets/images/hero-home.jpg';
-import heroAboutImage from '../../assets/images/hero-about.jpg';
-import batGeorgiaImage from '../../assets/images/Bat-Georgia.jpg';
+import { getImageInfo } from '../../lib/imageUtils';
+import { formatDate } from '../../lib/formatDate';
 
 export async function getStaticPaths() {
 	const posts = await getCollection('blog');
@@ -17,135 +14,16 @@ export async function getStaticPaths() {
 	}));
 }
 
-// Format date as "April 6, 2026"
-function formatDate(date: Date): string {
-	return date.toLocaleDateString('en-US', {
-		year: 'numeric',
-		month: 'long',
-		day: 'numeric'
-	});
-}
-
-// Unified image handling function
-function getImageInfo(imagePath: string) {
-	if (!imagePath) {
-		return { src: null, isPublic: false };
-	}
-	
-	// Check if it's a public image (starts with /images/ and has extension)
-	if (imagePath.startsWith('/images/') && /\.(jpg|jpeg|png|webp|gif|svg)$/i.test(imagePath)) {
-		return { 
-			src: '/marketing-blog' + imagePath, 
-			isPublic: true 
-		};
-	}
-	
-	// Handle legacy imported images
-	const imageName = imagePath.replace('/images/', '');
-	switch(imageName) {
-		case 'hero-home.jpg':
-			return { src: heroHomeImage, isPublic: false };
-		case 'hero-about.jpg':
-			return { src: heroAboutImage, isPublic: false };
-		case 'Bat-Georgia.jpg':
-			return { src: batGeorgiaImage, isPublic: false };
-		default:
-			return { src: batGeorgiaImage, isPublic: false };
-	}
-}
-
-// Process markdown content - convert markdown to HTML and handle images
-function processMarkdownContent(markdown: string | undefined): string {
-	// Guard clause for undefined/null content
-	if (!markdown || typeof markdown !== 'string') {
-		return '';
-	}
-	
-	let html = markdown;
-	
-	// Headers
-	html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
-	html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
-	html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
-	
-	// Lists
-	html = html.replace(/^(\s*)- (.+)$/gm, '<li>$2</li>');
-	html = html.replace(/^(\s*)\* (.+)$/gm, '<li>$2</li>');
-	
-	// Bold and italic
-	html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-	html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
-	
-		
-	// Links
-	html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
-	
-	// Paragraphs - wrap lines that aren't already wrapped in tags
-	const lines = html.split('\n');
-	let result = '';
-	let inList = false;
-	
-	for (const line of lines) {
-		const trimmed = line.trim();
-		
-		if (trimmed.startsWith('<li>')) {
-			if (!inList) {
-				result += '<ul>';
-				inList = true;
-			}
-			result += trimmed;
-		} else if (inList && !trimmed.startsWith('<li>')) {
-			result += '</ul>';
-			inList = false;
-			if (trimmed && !trimmed.startsWith('<')) {
-				result += '<p>' + trimmed + '</p>';
-			} else {
-				result += trimmed;
-			}
-		} else if (trimmed && !trimmed.startsWith('<')) {
-			result += '<p>' + trimmed + '</p>';
-		} else {
-			result += trimmed;
-		}
-	}
-	
-	if (inList) {
-		result += '</ul>';
-	}
-	
-	return result;
-}
-
-// Images - let proper image handling function process them
-function processMarkdownImages(html: string): string {
-	// Process images using the same logic as main image handling
-	return html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt, title) => {
-		const imageInfo = getImageInfo(`/images/${title}`);
-		if (imageInfo.isPublic) {
-			return `<img src="/marketing-blog/images/${title}" alt="${alt}" style="max-width: 100%; border-radius: 8px;" />`;
-		} else {
-			// For imported images, let the main template handle them
-			return match; // Don't modify, keep original ![alt](title) syntax
-		}
-	});
-}
-
 interface Props {
 	post: CollectionEntry<'blog'>;
 }
 
 const { post }: Props = Astro.props;
-const rendered = post.rendered;
-
-// Process post image
+const { Content } = await render(post);
 const imageInfo = getImageInfo(post.data.postImage);
-
-// Process content to handle images
-const processedContent = post.body ? processMarkdownContent(post.body) : '';
-
 ---
 
-<BaseLayout 
+<BaseLayout
 	title={post.data.title}
 	description={post.data.description}
 	image={post.data.postImage}
@@ -157,15 +35,15 @@ const processedContent = post.body ? processMarkdownContent(post.body) : '';
 		<header class="post-header">
 			{imageInfo.src && (
 			imageInfo.isPublic ? (
-				<img 
-					src={imageInfo.src} 
+				<img
+					src={imageInfo.src}
 					alt={post.data.title}
 					loading="eager"
 					class="header-image"
 				/>
 			) : (
-				<Image 
-					src={imageInfo.src} 
+				<Image
+					src={imageInfo.src}
 					alt={post.data.title}
 					width={400}
 					height={400}
@@ -176,7 +54,7 @@ const processedContent = post.body ? processMarkdownContent(post.body) : '';
 				/>
 			)
 		)}
-			
+
 			<div class="header-content">
 				<h1>{post.data.title}</h1>
 				<p><em>{post.data.description}</em></p>
@@ -190,9 +68,11 @@ const processedContent = post.body ? processMarkdownContent(post.body) : '';
 				)}
 			</div>
 		</header>
-		
-		<div class="post-content" data-pagefind-body set:html={processedContent} />
-		
+
+		<div class="post-content" data-pagefind-body>
+			<Content />
+		</div>
+
 		<footer>
 			<p>
 				<a href={`${import.meta.env.BASE_URL}blog/`}>← Back to Blog</a>
@@ -209,7 +89,7 @@ const processedContent = post.body ? processMarkdownContent(post.body) : '';
 		gap: 1.5rem;
 		margin-bottom: 2rem;
 	}
-	
+
 	:global(.header-image) {
 		max-width: 100%;
 		width: 400px;
@@ -218,32 +98,32 @@ const processedContent = post.body ? processMarkdownContent(post.body) : '';
 		border-radius: 8px;
 		flex-shrink: 0;
 	}
-	
+
 	.header-content {
 		flex: 1;
 		min-width: 0;
 		text-align: left;
 		max-width: 100%;
 	}
-	
+
 	.header-content h1 {
 		margin-top: 0;
 	}
-	
+
 	/* Mobile: stack vertically with centered content (Pico's breakpoint at 768px) */
 	@media (max-width: 768px) {
 		.post-header {
 			flex-direction: column;
 			align-items: center;
 		}
-		
+
 		:global(.header-image) {
 			width: 100%;
 			max-width: 300px;
 			height: auto;
 			aspect-ratio: 1;
 		}
-		
+
 		.header-content {
 			width: 100%;
 			text-align: center;

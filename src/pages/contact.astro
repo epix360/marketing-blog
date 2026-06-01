@@ -73,7 +73,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 	
 	form?.addEventListener('submit', async (e) => {
 		e.preventDefault();
-		
+
+		if (!form?.checkValidity()) return;
+
 		if (!serviceID || !templateID || !publicKey) {
 			showMessage('Email service not configured. Please check back later.', 'error');
 			return;

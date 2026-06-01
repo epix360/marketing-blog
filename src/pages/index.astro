@@ -3,85 +3,17 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import fs from 'fs/promises';
 import { join } from 'path';
 import { Image } from 'astro:assets';
-
-// Import available images
-import heroHomeImage from '../assets/images/hero-home.jpg';
-import heroAboutImage from '../assets/images/hero-about.jpg';
-import batGeorgiaImage from '../assets/images/Bat-Georgia.jpg';
-import angelc3poImage from '../assets/images/angelc3po.jpg';
-
-// Simple markdown to HTML converter
-function markdownToHtml(markdown: string): string {
-	let html = markdown;
-	
-	// Headers
-	html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
-	html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
-	html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
-	
-	// Lists
-	html = html.replace(/^- (.+)$/gm, '<li>$1</li>');
-	html = html.replace(/^\* (.+)$/gm, '<li>$1</li>');
-	
-	// Bold and italic
-	html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-	html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
-	
-	// Paragraphs
-	html = html.replace(/\n\n/g, '</p><p>');
-	html = html.replace(/\n/g, '<br>');
-	
-	// Wrap in paragraphs
-	const lines = html.split('<br>');
-	let result = '';
-	for (let i = 0; i < lines.length; i++) {
-		const line = lines[i].trim();
-		if (line && !line.startsWith('<') && !line.startsWith('</')) {
-			result += '<p>' + line + '</p>';
-		} else {
-			result += line;
-		}
-	}
-	
-	return result;
-}
-
-// Image mapping function
-function getImageSrc(imagePath: string) {
-	const imageName = imagePath.replace('/images/', '');
-	
-	// Handle new .webp images from public/images/
-	if (imageName.endsWith('.webp')) {
-		// Return null to indicate this is a public folder image
-		// that should be referenced by URL, not imported
-		return null;
-	}
-	
-	// Handle legacy .jpg images from src/assets/images/
-	switch(imageName) {
-		case 'hero-home.jpg':
-			return heroHomeImage;
-		case 'hero-about.jpg':
-			return heroAboutImage;
-		case 'Bat-Georgia.jpg':
-			return batGeorgiaImage;
-		case 'angelc3po.jpg':
-			return angelc3poImage;
-		default:
-			return heroHomeImage; // fallback
-	}
-}
+import { getImageInfo } from '../lib/imageUtils';
+import { markdownToHtml } from '../lib/markdown';
 
 // Get home page content from individual file
 let homeData = null;
-let heroImageSrc = null;
-let heroImageIsPublic = false;
-let publicImagePath = null;
+let heroImagePath = "/images/hero-home.jpg";
 
 try {
 	const contentPath = join(process.cwd(), 'src/content/home/index.md');
 	const fileContent = await fs.readFile(contentPath, 'utf-8');
-	
+
 	// Parse frontmatter and content - handle multi-line frontmatter
 	const frontmatterStart = fileContent.indexOf('---');
 	if (frontmatterStart !== -1) {
@@ -89,27 +21,13 @@ try {
 		if (secondDashIndex !== -1) {
 			const frontmatter = fileContent.substring(frontmatterStart + 3, secondDashIndex);
 			const body = fileContent.substring(secondDashIndex + 3);
-			
+
 			// Simple frontmatter parsing
 			const titleMatch = frontmatter.match(/title:\s*"([^"]+)"/);
 			const heroImageMatch = frontmatter.match(/heroImage:\s*(?:"([^"]+)"|([^\n]+))/);
-			
-			// Handle hero image path (check both capture groups for quoted/unquoted)
-			const heroImagePath = heroImageMatch?.[1] || heroImageMatch?.[2]?.trim() || "/images/hero-home.jpg";
-			const imageName = heroImagePath.replace('/images/', '');
-			
-			// Check if this is a public folder webp image
-			if (imageName.endsWith('.webp')) {
-				heroImageIsPublic = true;
-				publicImagePath = '/marketing-blog' + heroImagePath;
-				heroImageSrc = null;
-			} else {
-				// Legacy imported image
-				heroImageIsPublic = false;
-				publicImagePath = null;
-				heroImageSrc = getImageSrc(heroImagePath);
-			}
-			
+
+			heroImagePath = heroImageMatch?.[1] || heroImageMatch?.[2]?.trim() || "/images/hero-home.jpg";
+
 			homeData = {
 				data: {
 					title: titleMatch?.[1] || "Marketing Blog - Home",
@@ -121,11 +39,9 @@ try {
 	}
 } catch (error) {
 	console.warn('Could not load home content:', error);
-	// Fallback to default hero image
-	heroImageSrc = heroHomeImage;
-	heroImageIsPublic = false;
-	publicImagePath = null;
 }
+
+const heroImageInfo = getImageInfo(heroImagePath);
 
 // Use CMS content if available
 const title = homeData?.data?.title || "Marketing Blog - Home";
@@ -142,26 +58,26 @@ const renderedContent = content ? markdownToHtml(content) : "";
 	description={description}
 	image={heroImage}
 >
-	{heroImageSrc && !heroImageIsPublic && (
-		<Image 
-			src={heroImageSrc} 
-			alt="Hero image" 
-			width={1200} 
-			height={400}
-			format="webp"
-			quality={80}
-			loading="eager"
-			style="width: 100%; max-height: 400px; object-fit: cover; border-radius: 8px; margin-bottom: 2rem;"
-		/>
-	)}
-	
-	{heroImageIsPublic && publicImagePath && (
-		<img 
-			src={publicImagePath} 
-			alt="Hero image" 
-			loading="eager"
-			style="width: 100%; max-height: 400px; object-fit: cover; border-radius: 8px; margin-bottom: 2rem;"
-		/>
+	{heroImageInfo.src && (
+		heroImageInfo.isPublic ? (
+			<img
+				src={heroImageInfo.src}
+				alt="Hero image"
+				loading="eager"
+				style="width: 100%; max-height: 400px; object-fit: cover; border-radius: 8px; margin-bottom: 2rem;"
+			/>
+		) : (
+			<Image
+				src={heroImageInfo.src}
+				alt="Hero image"
+				width={1200}
+				height={400}
+				format="webp"
+				quality={80}
+				loading="eager"
+				style="width: 100%; max-height: 400px; object-fit: cover; border-radius: 8px; margin-bottom: 2rem;"
+			/>
+		)
 	)}
 	
 	{homeData ? (

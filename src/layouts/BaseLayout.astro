@@ -63,7 +63,6 @@ const normBase = normalize(base);
 			z-index: 100;
 			background: #13141f;
 			border-bottom: 1px solid rgba(194, 199, 208, 0.1);
-			box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 			transition: padding 0.3s ease, box-shadow 0.3s ease;
 			padding: 0;
 			box-shadow: 0 1px 3px rgba(0,0,0,0.08);
@@ -352,7 +351,7 @@ const normBase = normalize(base);
 				<!-- Drawer for mobile nav -->
 				<div class="nav-drawer">
 					<ul class="nav-links">
-						<li class={normPath === normBase || normPath === normBase + '/' ? 'active' : ''}>
+						<li class={normPath === normBase || normPath === '/' ? 'active' : ''}>
 							<a class="stretched-link" href={base}>Home</a>
 						</li>
 						<li class={normPath.startsWith(normBase + '/blog') || normPath === normBase + '/blog' ? 'active' : ''}>

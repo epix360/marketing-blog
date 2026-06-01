@@ -5,7 +5,7 @@ export interface ContentData {
 }
 
 export interface ImageData {
-	src: any;
+	src: import('astro').ImageMetadata | string | null;
 	alt?: string;
 	width?: number;
 	height?: number;
